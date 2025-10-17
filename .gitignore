@@ -38,3 +38,6 @@ wf*/
 
 ### Certs ###
 certs/
+
+### Logs ###
+logs/
