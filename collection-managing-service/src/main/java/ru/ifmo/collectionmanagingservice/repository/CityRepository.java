@@ -20,6 +20,7 @@ public class CityRepository {
     public City save(City city) {
         if (city.getId() == null) {
             em.persist(city);
+            em.flush(); // Force ID generation
             return city;
         } else {
             return em.merge(city);
