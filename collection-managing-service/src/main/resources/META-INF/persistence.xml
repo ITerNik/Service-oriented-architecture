@@ -5,7 +5,7 @@
                                  https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
 
-    <persistence-unit name="cityPU" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="cityPU" transaction-type="JTA">
         <class>ru.ifmo.collectionmanagingservice.model.City</class>
 
         <properties>
@@ -13,9 +13,10 @@
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/serviceoriented"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
             <property name="jakarta.persistence.jdbc.password" value="postgres"/>
-
-            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
