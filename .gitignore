@@ -34,3 +34,7 @@ build/
 
 ### WildFly ###
 wildfly-*
+wf*/
+
+### Certs ###
+certs/
