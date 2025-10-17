@@ -63,7 +63,7 @@ set_port() {
   local xml="$1"
   local listener="$2"
   local port="$3"
-  sed -i "s#<socket-binding name=\"$listener\" port=\"[^\"]*\"#<socket-binding name=\"$listener\" port=\"$port\"#g" "$xml"
+  sed -i "s#\(<socket-binding name=\"$listener\"[^>]*port=\"\)[^\"]*\"#\1$port\"#g" "$xml"
 }
 
 set_port "$WF1_DIR/standalone/configuration/standalone.xml" http "$WF1_PORT_HTTP"
