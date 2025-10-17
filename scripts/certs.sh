@@ -82,38 +82,107 @@ cp "$OUT_DIR/$APP1_NAME/truststore.jks" "$APP1_WF_DIR"/standalone/configuration/
 cp "$OUT_DIR/$APP2_NAME/truststore.jks" "$APP2_WF_DIR"/standalone/configuration/truststore.jks
 cp "$OUT_DIR/$APP3_NAME/truststore.jks" "$APP3_WF_DIR"/standalone/configuration/truststore.jks
 
-echo "Step 4: Insert system-properties into standalone.xml files"
+echo "Step 4: Add SSL configuration to standalone.conf files"
 
-insert_system_properties() {
+add_ssl_to_standalone_conf() {
   local wf_dir="$1"
-  local xml="$wf_dir/standalone/configuration/standalone.xml"
-  local keystore_path="\${jboss.server.config.dir}/keystore.jks"
-  local truststore_path="\${jboss.server.config.dir}/truststore.jks"
+  local conf="$wf_dir/bin/standalone.conf"
 
-  if grep -q "<system-properties>" "$xml"; then
-    echo "system-properties already exist in $xml, skipping"
+  if grep -q "javax.net.ssl.trustStore" "$conf"; then
+    echo "SSL config already exists in $conf, skipping"
     return
   fi
 
-  tmpfile=$(mktemp)
-  cat << EOF > "$tmpfile"
-<system-properties>
-    <property name="javax.net.ssl.trustStore" value="$truststore_path"/>
-    <property name="javax.net.ssl.trustStorePassword" value="$PASS"/>
-    <property name="javax.net.ssl.keyStore" value="$keystore_path"/>
-    <property name="javax.net.ssl.keyStorePassword" value="$PASS"/>
-</system-properties>
+  cat >> "$conf" << 'EOF'
+
+# SSL/TLS Configuration for mutual TLS (added by certs.sh)
+JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=$JBOSS_HOME/standalone/configuration/truststore.jks"
+JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStorePassword=changeit"
+JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.keyStore=$JBOSS_HOME/standalone/configuration/keystore.jks"
+JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.keyStorePassword=changeit"
 EOF
 
-  sed -i "/<server[^>]*>/r $tmpfile" "$xml"
-
-  rm "$tmpfile"
-
-  echo "Inserted system-properties into $xml"
+  echo "Added SSL config to $conf"
 }
 
-insert_system_properties "$APP1_WF_DIR"
-insert_system_properties "$APP2_WF_DIR"
-insert_system_properties "$APP3_WF_DIR"
+add_ssl_to_standalone_conf "$APP1_WF_DIR"
+add_ssl_to_standalone_conf "$APP2_WF_DIR"
+add_ssl_to_standalone_conf "$APP3_WF_DIR"
 
-echo "Certs inserted and configured successfully."
+echo "Step 5: Configure WildFly Elytron to use our keystores"
+
+configure_wildfly_ssl() {
+  local wf_dir="$1"
+  local standalone_xml="$wf_dir/standalone/configuration/standalone.xml"
+  
+  echo "Configuring SSL in $standalone_xml"
+  
+  sed -i '/<tls>/,/<\/tls>/c\
+            <tls>\
+                <key-stores>\
+                    <key-store name="serverKeyStore">\
+                        <credential-reference clear-text="changeit"/>\
+                        <implementation type="JKS"/>\
+                        <file path="keystore.jks" relative-to="jboss.server.config.dir"/>\
+                    </key-store>\
+                    <key-store name="serverTrustStore">\
+                        <credential-reference clear-text="changeit"/>\
+                        <implementation type="JKS"/>\
+                        <file path="truststore.jks" relative-to="jboss.server.config.dir"/>\
+                    </key-store>\
+                </key-stores>\
+                <key-managers>\
+                    <key-manager name="serverKeyManager" key-store="serverKeyStore">\
+                        <credential-reference clear-text="changeit"/>\
+                    </key-manager>\
+                </key-managers>\
+                <trust-managers>\
+                    <trust-manager name="serverTrustManager" key-store="serverTrustStore"/>\
+                </trust-managers>\
+                <server-ssl-contexts>\
+                    <server-ssl-context name="applicationSSC" key-manager="serverKeyManager" trust-manager="serverTrustManager"/>\
+                </server-ssl-contexts>\
+            </tls>' "$standalone_xml"
+  
+  echo "Configured SSL for $wf_dir"
+}
+
+configure_wildfly_ssl "$APP1_WF_DIR"
+configure_wildfly_ssl "$APP2_WF_DIR"
+configure_wildfly_ssl "$APP3_WF_DIR"
+
+echo "Certs and SSL configuration completed successfully."
+
+# Step 6: Export PKCS#12 and PEM files for Postman/Insomnia
+export_artifacts() {
+  local name="$1"
+  local dir="$OUT_DIR/$name"
+  local p12="$dir/keystore.p12"
+  local pem_cert="$dir/cert.pem"
+  local pem_key="$dir/key.pem"
+
+  echo "Exporting PKCS#12 and PEM for $name"
+
+  # Export JKS -> PKCS12
+  keytool -importkeystore -srckeystore "$dir/keystore.jks" -srcstorepass "$PASS" \
+    -destkeystore "$p12" -deststoretype PKCS12 -deststorepass "$PASS" -srcalias server -destalias server -srckeypass "$PASS" -destkeypass "$PASS" -noprompt
+
+  # Extract cert and key from PKCS12 using openssl
+  openssl pkcs12 -in "$p12" -nodes -passin pass:"$PASS" -out "$dir/p12_all.pem"
+  # Separate cert and key
+  awk '/-----BEGIN CERTIFICATE-----/{flag=1} flag{print} /-----END CERTIFICATE-----/{flag=0}' "$dir/p12_all.pem" > "$pem_cert"
+  awk '/-----BEGIN PRIVATE KEY-----/{flag=1} flag{print} /-----END PRIVATE KEY-----/{flag=0}' "$dir/p12_all.pem" > "$pem_key"
+  rm -f "$dir/p12_all.pem"
+
+  # Also provide a combined .pem (cert+key) which some tools accept
+  cat "$pem_key" "$pem_cert" > "$dir/combined.pem"
+
+  echo "Exported: $p12, $pem_cert, $pem_key, $dir/combined.pem"
+}
+
+export_artifacts "$APP1_NAME"
+export_artifacts "$APP2_NAME"
+export_artifacts "$APP3_NAME"
+
+cat "$OUT_DIR/$APP1_NAME/combined.pem" "$OUT_DIR/$APP2_NAME/combined.pem" "$OUT_DIR/$APP3_NAME/combined.pem" > "$OUT_DIR/all-clients-combined.pem"
+echo "Created all-clients bundle: $OUT_DIR/all-clients-combined.pem (all certs+keys)"
