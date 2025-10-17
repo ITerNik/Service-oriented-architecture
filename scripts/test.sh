@@ -44,4 +44,4 @@ stop_wildfly "$APP1_WF_DIR" $((WF1_PORT_HTTPS+1))
 stop_wildfly "$APP2_WF_DIR" $((WF2_PORT_HTTPS+1))
 echo "All WildFly instances stopped."
 
-docker-compose down
+docker compose down
