@@ -63,11 +63,15 @@ set_port() {
   local xml="$1"
   local listener="$2"
   local port="$3"
-  sed -i "s#<socket-binding name=\"$listener\" port=\"[0-9]\+\"#<socket-binding name=\"$listener\" port=\"$port\"#g" "$xml"
+  sed -i "s#<socket-binding name=\"$listener\" port=\"[^\"]*\"#<socket-binding name=\"$listener\" port=\"$port\"#g" "$xml"
 }
 
 set_port "$WF1_DIR/standalone/configuration/standalone.xml" http "$WF1_PORT_HTTP"
 set_port "$WF1_DIR/standalone/configuration/standalone.xml" https "$WF1_PORT_HTTPS"
+set_port "$WF1_DIR/standalone/configuration/standalone.xml" management-http "$((WF1_PORT_HTTPS+1))"
+set_port "$WF1_DIR/standalone/configuration/standalone.xml" management-https "$((WF1_PORT_HTTPS+2))"
 
 set_port "$WF2_DIR/standalone/configuration/standalone.xml" http "$WF2_PORT_HTTP"
 set_port "$WF2_DIR/standalone/configuration/standalone.xml" https "$WF2_PORT_HTTPS"
+set_port "$WF2_DIR/standalone/configuration/standalone.xml" management-http "$((WF2_PORT_HTTPS+1))"
+set_port "$WF2_DIR/standalone/configuration/standalone.xml" management-https "$((WF2_PORT_HTTPS+2))"
