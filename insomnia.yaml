@@ -1,0 +1,539 @@
+type: collection.insomnia.rest/5.0
+name: City Management API
+meta:
+  id: wrk_8ff1213ff1894a308bc74e8144be2b21
+  created: 1760667239808
+  modified: 1760667239808
+collection:
+  - name: Cities CRUD
+    meta:
+      id: fld_657c03f19aed4d42b8c41c3945503f42
+      created: 1760667239844
+      modified: 1760667239844
+      sortKey: -1760667239844
+    children:
+      - url: "{{ _.service1_url }}/cities"
+        name: Get All Cities
+        meta:
+          id: req_0b531cb9ec874f37a5cdaf220f06ec8c
+          created: 1760667239815
+          modified: 1760667239815
+          isPrivate: false
+          sortKey: -1760667239815
+        method: GET
+        parameters:
+          - name: page
+            value: "0"
+            disabled: false
+          - name: size
+            value: "10"
+            disabled: false
+          - name: sort
+            value: name
+            disabled: true
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Get Cities (Sorted by Population DESC)
+        meta:
+          id: req_36a43b38070c44ff8a653c61eb836d94
+          created: 1760667239817
+          modified: 1760667239817
+          isPrivate: false
+          sortKey: -1760667239817
+        method: GET
+        parameters:
+          - name: page
+            value: "0"
+          - name: size
+            value: "20"
+          - name: sort
+            value: -population
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Get Cities (Filtered by Climate)
+        meta:
+          id: req_095684c8eed944c4a6f58c9d91388770
+          created: 1760667239820
+          modified: 1760667239820
+          isPrivate: false
+          sortKey: -1760667239820
+        method: GET
+        parameters:
+          - name: climate
+            value: TUNDRA
+          - name: page
+            value: "0"
+          - name: size
+            value: "10"
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities/1"
+        name: Get City by ID
+        meta:
+          id: req_61efea790ef348a486332e336c40cec8
+          created: 1760667239821
+          modified: 1760667239821
+          isPrivate: false
+          sortKey: -1760667239822
+        method: GET
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Create City
+        meta:
+          id: req_2660d2eb6de44c06b93d0efb654d4c09
+          created: 1760667239823
+          modified: 1760667239823
+          isPrivate: false
+          sortKey: -1760667239823
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Санкт-Петербург",
+              "coordinates": {
+                "x": 30.3141,
+                "y": 59.9386
+              },
+              "area": 1439,
+              "population": 5398064,
+              "metersAboveSeaLevel": 3,
+              "capital": false,
+              "agglomeration": 6.5,
+              "climate": "HUMIDCONTINENTAL",
+              "governor": {
+                "height": 175.5,
+                "birthday": "1970-05-15"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Create City - Moscow
+        meta:
+          id: req_95273624e60b40c4b1a670a5f6aed4b8
+          created: 1760667239825
+          modified: 1760667310523
+          isPrivate: false
+          sortKey: -1760667239825
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Москва",
+              "coordinates": {
+                "x": 37.6173,
+                "y": 55.7558
+              },
+              "area": 2561,
+              "population": 12655050,
+              "metersAboveSeaLevel": 156,
+              "capital": true,
+              "agglomeration": 17.1,
+              "climate": "HUMIDCONTINENTAL",
+              "governor": {
+                "height": 180.0,
+                "birthday": "1965-12-10"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Create City - Norilsk (TUNDRA)
+        meta:
+          id: req_45f6fddd195d44c088d819c39ecd0724
+          created: 1760667239826
+          modified: 1760667239826
+          isPrivate: false
+          sortKey: -1760667239826
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Норильск",
+              "coordinates": {
+                "x": 88.2027,
+                "y": 69.3558
+              },
+              "area": 4509,
+              "population": 175301,
+              "metersAboveSeaLevel": 30,
+              "capital": false,
+              "agglomeration": 0.18,
+              "climate": "TUNDRA",
+              "governor": {
+                "height": 172.0,
+                "birthday": "1975-03-22"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Create City - Astrakhan (DESERT)
+        meta:
+          id: req_b9394854f841480a8bf6c2d554445f81
+          created: 1760667239828
+          modified: 1760667239828
+          isPrivate: false
+          sortKey: -1760667239828
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Астрахань",
+              "coordinates": {
+                "x": 48.0406,
+                "y": 46.3497
+              },
+              "area": 208,
+              "population": 475629,
+              "metersAboveSeaLevel": -23,
+              "capital": false,
+              "agglomeration": 1.02,
+              "climate": "DESERT",
+              "governor": {
+                "height": 168.5,
+                "birthday": "1968-08-30"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities/1"
+        name: Update City
+        meta:
+          id: req_cd223fdffca743f99974c4197e36cf11
+          created: 1760667239830
+          modified: 1760667239830
+          isPrivate: false
+          sortKey: -1760667239830
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Санкт-Петербург (обновлено)",
+              "coordinates": {
+                "x": 30.3141,
+                "y": 59.9386
+              },
+              "area": 1439,
+              "population": 5500000,
+              "metersAboveSeaLevel": 3,
+              "capital": false,
+              "agglomeration": 6.7,
+              "climate": "HUMIDCONTINENTAL",
+              "governor": {
+                "height": 175.5,
+                "birthday": "1970-05-15"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities/1"
+        name: Delete City by ID
+        meta:
+          id: req_37a7f957043f42a591195fc97765184e
+          created: 1760667239831
+          modified: 1760667239831
+          isPrivate: false
+          sortKey: -1760667239831
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Special Operations
+    meta:
+      id: fld_cfbaadc4e80a48ac96cd4d28792a1f91
+      created: 1760667239846
+      modified: 1760667239846
+      sortKey: -1760667239846
+    children:
+      - url: "{{ _.service1_url }}/cities/special/less-than-meters/"
+        name: Delete City by Meters Above Sea Level
+        meta:
+          id: req_6644847958684cdc962b21790ced8a32
+          created: 1760667239833
+          modified: 1760667239833
+          isPrivate: false
+          sortKey: -1760667239833
+        method: DELETE
+        parameters:
+          - name: less-than-meters
+            value: "10"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities/special/min-name"
+        name: Get City with Min Name
+        meta:
+          id: req_deddfede900f4e4986270fae793dadb7
+          created: 1760667239834
+          modified: 1760667239834
+          isPrivate: false
+          sortKey: -1760667239834
+        method: GET
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities/special/max-climate"
+        name: Get City with Max Climate
+        meta:
+          id: req_4ee55f0f55bf4df38df0a5be2e49bab0
+          created: 1760667239836
+          modified: 1760667239836
+          isPrivate: false
+          sortKey: -1760667239836
+        method: GET
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Route Calculations (Service 2)
+    meta:
+      id: fld_5b8faf6477b142b99b7417808c2caafc
+      created: 1760667239848
+      modified: 1760667239848
+      sortKey: -1760667239848
+    children:
+      - url: "{{ _.service2_url }}/route/calculate/to-max-populated"
+        name: Calculate Route to Max Populated
+        meta:
+          id: req_e37ca2cda22a4037a1728ebe7e4ed94b
+          created: 1760667239838
+          modified: 1760667239838
+          isPrivate: false
+          sortKey: -1760667239838
+        method: GET
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service2_url }}/route/calculate/between-oldest-and-newest"
+        name: Calculate Route Between Oldest and Newest
+        meta:
+          id: req_57b86ec68a18417ea65e233a0e0857ec
+          created: 1760667239839
+          modified: 1760667239839
+          isPrivate: false
+          sortKey: -1760667239839
+        method: GET
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Tests & Edge Cases
+    meta:
+      id: fld_c0fef6dc10404ab19470c356499a0849
+      created: 1760667239849
+      modified: 1760667239849
+      sortKey: -1760667239849
+    children:
+      - url: "{{ _.service1_url }}/cities"
+        name: Test Validation Error (Invalid Data)
+        meta:
+          id: req_f03a08ac0d0c439aaf92a35908c01314
+          created: 1760667239841
+          modified: 1760667239841
+          isPrivate: false
+          sortKey: -1760667239841
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "",
+              "coordinates": {
+                "x": 0,
+                "y": -200
+              },
+              "area": 0,
+              "population": 0,
+              "climate": "HUMIDCONTINENTAL",
+              "governor": {
+                "height": 0
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.service1_url }}/cities"
+        name: Complex Filter and Sort
+        meta:
+          id: req_a1d639cde94e4898b24a3851cba088b1
+          created: 1760667239842
+          modified: 1760667239842
+          isPrivate: false
+          sortKey: -1760667239842
+        method: GET
+        parameters:
+          - name: climate
+            value: HUMIDCONTINENTAL
+          - name: capital
+            value: "true"
+          - name: sort
+            value: -population,name
+          - name: page
+            value: "0"
+          - name: size
+            value: "5"
+        headers:
+          - name: Accept
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_12ea51f7ed8586d20935c4001d4d6181017c12a6
+    created: 1760667270041
+    modified: 1760667270041
+environments:
+  name: Base Environment
+  meta:
+    id: env_aa68450267154ec2bfde994fbf234562
+    created: 1760667239812
+    modified: 1760667337429
+    isPrivate: false
+  data:
+    service1_url: https://localhost:34566/collection-managing-service-1.0-SNAPSHOT/api
+    service2_url: https://localhost:23442/collection-managing-service-1.0-SNAPSHOT/api
