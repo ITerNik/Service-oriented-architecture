@@ -6,14 +6,18 @@ WF_TAR="$WF_DIR.tar.gz"
 
 WF1_DIR="wf1"
 WF2_DIR="wf2"
+WF3_DIR="wf3"
 
 WF1_PORT_HTTP=31468
 WF1_PORT_HTTPS=34566
 WF2_PORT_HTTP=44968
 WF2_PORT_HTTPS=23442
+WF3_PORT_HTTP=32453
+WF3_PORT_HTTPS=45312
 
 WAR1_FILE="collection-managing-service/target/collection-managing-service-1.0-SNAPSHOT.war"
 WAR2_FILE="calculating-service/target/calculating-service-0.0.1-SNAPSHOT.war"
+WAR3_FILE="front/target/front-0.0.1-SNAPSHOT.war"
 
 if [ -d "$WF_DIR" ]; then
 	echo "$WF_DIR already exists — skipping download and extract."
@@ -45,6 +49,8 @@ set_service_port() {
 }
 
 set_service_port "calculating-service/src/main/resources/application.properties" "collection-managing-service.url" "$WF1_PORT_HTTPS"
+set_service_port "front/src/main/resources/application.properties" "backend.service1.url" "$WF1_PORT_HTTPS"
+set_service_port "front/src/main/resources/application.properties" "backend.service2.url" "$WF2_PORT_HTTPS"
 
 echo "mvn package"
 
@@ -75,3 +81,8 @@ set_port "$WF2_DIR/standalone/configuration/standalone.xml" http "$WF2_PORT_HTTP
 set_port "$WF2_DIR/standalone/configuration/standalone.xml" https "$WF2_PORT_HTTPS"
 set_port "$WF2_DIR/standalone/configuration/standalone.xml" management-http "$((WF2_PORT_HTTPS+1))"
 set_port "$WF2_DIR/standalone/configuration/standalone.xml" management-https "$((WF2_PORT_HTTPS+2))"
+
+set_port "$WF3_DIR/standalone/configuration/standalone.xml" http "$WF3_PORT_HTTP"
+set_port "$WF3_DIR/standalone/configuration/standalone.xml" https "$WF3_PORT_HTTPS"
+set_port "$WF3_DIR/standalone/configuration/standalone.xml" management-http "$((WF3_PORT_HTTPS+1))"
+set_port "$WF3_DIR/standalone/configuration/standalone.xml" management-https "$((WF3_PORT_HTTPS+2))"

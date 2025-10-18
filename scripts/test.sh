@@ -3,15 +3,20 @@ set -euo pipefail
 
 APP1_WF_DIR="$(pwd)/wf1"
 APP2_WF_DIR="$(pwd)/wf2"
+APP3_WF_DIR="$(pwd)/wf3"
 
 WF1_PORT_HTTPS=34566
 WF2_PORT_HTTPS=23442
+WF3_PORT_HTTPS=45312
 
 docker compose up -d
 
 echo "Waiting for PostgreSQL to be ready..."
 
-sleep 5
+until docker exec soa_postgres pg_isready -U postgres > /dev/null 2>&1; do
+  echo "PostgreSQL is not ready yet. Waiting..."
+  sleep 1
+done
 
 LOG_DIR="$(pwd)/logs"
 mkdir -p "$LOG_DIR"
@@ -26,6 +31,7 @@ start_wildfly() {
 
 start_wildfly "$APP1_WF_DIR" "app1"
 start_wildfly "$APP2_WF_DIR" "app2"
+start_wildfly "$APP3_WF_DIR" "app3"
 
 echo "All WildFly instances started."
 
@@ -42,6 +48,7 @@ read -r
 
 stop_wildfly "$APP1_WF_DIR" $((WF1_PORT_HTTPS+1))
 stop_wildfly "$APP2_WF_DIR" $((WF2_PORT_HTTPS+1))
+stop_wildfly "$APP3_WF_DIR" $((WF3_PORT_HTTPS+1))
 echo "All WildFly instances stopped."
 
 docker compose down
