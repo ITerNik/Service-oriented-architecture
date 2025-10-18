@@ -5,6 +5,7 @@
 	<modules>
 		<module>calculating-service</module>
 		<module>collection-managing-service</module>
+		<module>front</module>
 	</modules>
 	<groupId>org.example</groupId>
 	<artifactId>Service-oriented-architecture</artifactId>
