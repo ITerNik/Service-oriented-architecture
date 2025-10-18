@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <!-- Use WildFly's logging infrastructure (JBoss LogManager) -->
+        <!-- No exclusions needed - Spring Boot will use SLF4J API, WildFly provides implementation -->
+    </deployment>
+</jboss-deployment-structure>
