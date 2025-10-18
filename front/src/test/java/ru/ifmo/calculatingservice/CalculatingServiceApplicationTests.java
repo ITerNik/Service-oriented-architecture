@@ -1,7 +1,7 @@
-package ru.ifmo.calculatingservice;
+package ru.ifmo.front;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CalculatingServiceApplicationTests {
+class FrontApplicationTests {
 }
