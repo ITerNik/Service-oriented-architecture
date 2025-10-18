@@ -8,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Enumeration;
-import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
@@ -21,7 +20,6 @@ public class ApiProxyController {
     private String service2Url;
 
     private final RestTemplate restTemplate;
-    private final Random random = new Random();
 
     public ApiProxyController() {
         this.restTemplate = new RestTemplate();

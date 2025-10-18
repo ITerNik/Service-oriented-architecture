@@ -24,17 +24,18 @@ public class AppConfig implements WebMvcConfigurer {
         return mapper;
     }
     
-    @Override
+        @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Обработка статических ресурсов
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/", "classpath:/public/")
-                .resourceChain(true);
+                .addResourceLocations("classpath:/static/")
+                .setCachePeriod(0)
+                .resourceChain(false);
     }
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // Для SPA - все не-api пути перенаправляем на index.html
+        // Для корня перенаправляем на index.html
         registry.addViewController("/").setViewName("forward:/index.html");
     }
 }
