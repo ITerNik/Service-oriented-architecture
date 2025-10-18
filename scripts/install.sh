@@ -64,6 +64,9 @@ echo "Deployed $WAR1_FILE to $WF1_DIR"
 cp "$WAR2_FILE" "$WF2_DIR"/standalone/deployments/
 echo "Deployed $WAR2_FILE to $WF2_DIR"
 
+cp "$WAR3_FILE" "$WF3_DIR"/standalone/deployments/
+echo "Deployed $WAR3_FILE to $WF3_DIR"
+
 
 set_port() {
   local xml="$1"
