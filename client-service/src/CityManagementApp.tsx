@@ -125,7 +125,7 @@ export default function CityManagementApp() {
 
   async function calculateToMaxPopulated() {
     try {
-      const response = await fetch(`${API_BASE_URL}/calculate/to-max-populated`);
+      const response = await fetch(`${API_BASE_URL}/route/calculate/to-max-populated`);
       if (!response.ok) {
         setError('Ошибка расчета маршрута');
         return;
@@ -140,7 +140,7 @@ export default function CityManagementApp() {
 
   async function calculateBetweenOldestNewest() {
     try {
-      const response = await fetch(`${API_BASE_URL}/calculate/between-oldest-and-newest`);
+      const response = await fetch(`${API_BASE_URL}/route/calculate/between-oldest-and-newest`);
       if (!response.ok) {
         setError('Ошибка расчета маршрута');
         return;
