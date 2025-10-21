@@ -24,3 +24,9 @@ Generates self-signed SSL certificates for WildFly instances and configures them
 ### test.sh
 
 Starts PostgreSQL and three WildFly instances. Stops them after testing.
+
+## Use
+
+```bash
+ssh -L 8080:localhost:8080 server918r818
+```

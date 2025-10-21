@@ -52,6 +52,16 @@ set_service_port "calculating-service/src/main/resources/application.properties"
 set_service_port "front/src/main/resources/application.properties" "backend.service1.url" "$WF1_PORT_HTTPS"
 set_service_port "front/src/main/resources/application.properties" "backend.service2.url" "$WF2_PORT_HTTPS"
 
+echo "Building static files for client-service"
+
+cd client-service
+npm install
+npm run build
+
+rm -rf ../front/src/main/resources/static/*
+cp -r dist/* ../front/src/main/resources/static/
+cd ..
+
 echo "mvn package"
 
 mvn clean package
