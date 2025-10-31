@@ -26,7 +26,6 @@ public class AppConfig implements WebMvcConfigurer {
     
         @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Обработка статических ресурсов
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
                 .setCachePeriod(0)
@@ -35,7 +34,6 @@ public class AppConfig implements WebMvcConfigurer {
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // Для корня перенаправляем на index.html
         registry.addViewController("/").setViewName("forward:/index.html");
     }
 }
