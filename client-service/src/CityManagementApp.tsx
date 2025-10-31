@@ -1,6 +1,6 @@
-import {useState, useEffect, type FormEventHandler} from 'react';
+import { useState, useEffect, type FormEventHandler } from 'react';
 import { Plus, Trash2, Edit, MapPin, AlertCircle } from 'lucide-react';
-import type {City} from "./types.ts";
+import type { City } from "./types.ts";
 
 const API_BASE_URL = import.meta.env.API_URL ?? 'http://localhost:8080/api';
 
@@ -69,7 +69,7 @@ export default function CityManagementApp() {
     }
   }
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e)=> {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -108,6 +108,7 @@ export default function CityManagementApp() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/cities/${id}`, {
+        headers: { 'Content-Type': 'application/json' },
         method: 'DELETE'
       });
 
@@ -227,7 +228,7 @@ export default function CityManagementApp() {
               type="text"
               placeholder="Фильтр по имени"
               className="border rounded-lg px-4 py-2"
-              onChange={(e) => setFilters({...filters, name: e.target.value})}
+              onChange={(e) => setFilters({ ...filters, name: e.target.value })}
             />
 
             <select
@@ -357,7 +358,7 @@ export default function CityManagementApp() {
                     required
                     className="w-full border rounded px-3 py-2"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
 
@@ -372,7 +373,7 @@ export default function CityManagementApp() {
                       value={formData.coordinates.x}
                       onChange={(e) => setFormData({
                         ...formData,
-                        coordinates: {...formData.coordinates, x: parseFloat(e.target.value)}
+                        coordinates: { ...formData.coordinates, x: parseFloat(e.target.value) }
                       })}
                     />
                   </div>
@@ -387,7 +388,7 @@ export default function CityManagementApp() {
                       value={formData.coordinates.y}
                       onChange={(e) => setFormData({
                         ...formData,
-                        coordinates: {...formData.coordinates, y: parseFloat(e.target.value)}
+                        coordinates: { ...formData.coordinates, y: parseFloat(e.target.value) }
                       })}
                     />
                   </div>
@@ -402,7 +403,7 @@ export default function CityManagementApp() {
                       required
                       className="w-full border rounded px-3 py-2"
                       value={formData.area}
-                      onChange={(e) => setFormData({...formData, area: parseInt(e.target.value)})}
+                      onChange={(e) => setFormData({ ...formData, area: parseInt(e.target.value) })}
                     />
                   </div>
                   <div>
@@ -413,7 +414,7 @@ export default function CityManagementApp() {
                       required
                       className="w-full border rounded px-3 py-2"
                       value={formData.population}
-                      onChange={(e) => setFormData({...formData, population: parseInt(e.target.value)})}
+                      onChange={(e) => setFormData({ ...formData, population: parseInt(e.target.value) })}
                     />
                   </div>
                 </div>
@@ -425,7 +426,7 @@ export default function CityManagementApp() {
                       type="number"
                       className="w-full border rounded px-3 py-2"
                       value={formData.metersAboveSeaLevel}
-                      onChange={(e) => setFormData({...formData, metersAboveSeaLevel: parseInt(e.target.value)})}
+                      onChange={(e) => setFormData({ ...formData, metersAboveSeaLevel: parseInt(e.target.value) })}
                     />
                   </div>
                   <div>
@@ -435,7 +436,7 @@ export default function CityManagementApp() {
                       step="0.01"
                       className="w-full border rounded px-3 py-2"
                       value={formData.agglomeration}
-                      onChange={(e) => setFormData({...formData, agglomeration: parseFloat(e.target.value)})}
+                      onChange={(e) => setFormData({ ...formData, agglomeration: parseFloat(e.target.value) })}
                     />
                   </div>
                 </div>
@@ -447,7 +448,7 @@ export default function CityManagementApp() {
                       required
                       className="w-full border rounded px-3 py-2"
                       value={formData.climate}
-                      onChange={(e) => setFormData({...formData, climate: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, climate: e.target.value })}
                     >
                       <option value="HUMIDCONTINENTAL">Влажный континентальный</option>
                       <option value="TUNDRA">Тундра</option>
@@ -460,7 +461,7 @@ export default function CityManagementApp() {
                       type="checkbox"
                       className="mt-2 w-5 h-5"
                       checked={formData.capital}
-                      onChange={(e) => setFormData({...formData, capital: e.target.checked})}
+                      onChange={(e) => setFormData({ ...formData, capital: e.target.checked })}
                     />
                   </div>
                 </div>
@@ -479,7 +480,7 @@ export default function CityManagementApp() {
                         value={formData.governor.height}
                         onChange={(e) => setFormData({
                           ...formData,
-                          governor: {...formData.governor, height: parseFloat(e.target.value)}
+                          governor: { ...formData.governor, height: parseFloat(e.target.value) }
                         })}
                       />
                     </div>
@@ -491,7 +492,7 @@ export default function CityManagementApp() {
                         value={formData.governor.birthday || ''}
                         onChange={(e) => setFormData({
                           ...formData,
-                          governor: {...formData.governor, birthday: e.target.value}
+                          governor: { ...formData.governor, birthday: e.target.value }
                         })}
                       />
                     </div>
