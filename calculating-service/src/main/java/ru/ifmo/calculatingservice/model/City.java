@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
 public class City {
-    private Long id;
+    private String id;
     private String name;
     private Coordinates coordinates;
 
@@ -20,37 +20,91 @@ public class City {
     private Climate climate;
     private Human governor;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public Coordinates getCoordinates() { return coordinates; }
-    public void setCoordinates(Coordinates coordinates) { this.coordinates = coordinates; }
+    public String getName() {
+        return name;
+    }
 
-    public LocalDate getCreationDate() { return creationDate; }
-    public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Integer getArea() { return area; }
-    public void setArea(Integer area) { this.area = area; }
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
 
-    public Integer getPopulation() { return population; }
-    public void setPopulation(Integer population) { this.population = population; }
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
 
-    public Integer getMetersAboveSeaLevel() { return metersAboveSeaLevel; }
-    public void setMetersAboveSeaLevel(Integer meters) { this.metersAboveSeaLevel = meters; }
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
 
-    public Boolean getCapital() { return capital; }
-    public void setCapital(Boolean capital) { this.capital = capital; }
+    public void setCreationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+    }
 
-    public Float getAgglomeration() { return agglomeration; }
-    public void setAgglomeration(Float agglomeration) { this.agglomeration = agglomeration; }
+    public Integer getArea() {
+        return area;
+    }
 
-    public Climate getClimate() { return climate; }
-    public void setClimate(Climate climate) { this.climate = climate; }
+    public void setArea(Integer area) {
+        this.area = area;
+    }
 
-    public Human getGovernor() { return governor; }
-    public void setGovernor(Human governor) { this.governor = governor; }
+    public Integer getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Integer population) {
+        this.population = population;
+    }
+
+    public Integer getMetersAboveSeaLevel() {
+        return metersAboveSeaLevel;
+    }
+
+    public void setMetersAboveSeaLevel(Integer meters) {
+        this.metersAboveSeaLevel = meters;
+    }
+
+    public Boolean getCapital() {
+        return capital;
+    }
+
+    public void setCapital(Boolean capital) {
+        this.capital = capital;
+    }
+
+    public Float getAgglomeration() {
+        return agglomeration;
+    }
+
+    public void setAgglomeration(Float agglomeration) {
+        this.agglomeration = agglomeration;
+    }
+
+    public Climate getClimate() {
+        return climate;
+    }
+
+    public void setClimate(Climate climate) {
+        this.climate = climate;
+    }
+
+    public Human getGovernor() {
+        return governor;
+    }
+
+    public void setGovernor(Human governor) {
+        this.governor = governor;
+    }
 }
-
