@@ -23,7 +23,7 @@ Generates self-signed SSL certificates for WildFly instances and configures them
 
 ### test.sh
 
-Starts PostgreSQL and three WildFly instances. Stops them after testing.
+Starts ~~PostgreSQL~~ MongoDB and three WildFly instances. Stops them after testing.
 
 ## Use
 

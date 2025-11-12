@@ -11,12 +11,14 @@ WF3_PORT_HTTPS=45312
 
 docker compose up -d
 
-echo "Waiting for PostgreSQL to be ready..."
+echo "Waiting for MongoDB to be ready..."
 
-until docker exec soa_postgres pg_isready -U postgres > /dev/null 2>&1; do
-  echo "PostgreSQL is not ready yet. Waiting..."
+until docker exec soa_mongodb mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+  echo "MongoDB is not ready yet. Waiting..."
   sleep 1
 done
+
+echo "MongoDB is ready!"
 
 LOG_DIR="$(pwd)/logs"
 mkdir -p "$LOG_DIR"

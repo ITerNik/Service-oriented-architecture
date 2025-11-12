@@ -34,7 +34,7 @@ public class CityResource {
         try {
             City created = cityService.createCity(city);
             UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-            builder.path(Long.toString(created.getId()));
+            builder.path(created.getId());
             return Response.created(builder.build())
                     .entity(created)
                     .build();
@@ -47,7 +47,7 @@ public class CityResource {
 
     @GET
     @Path("/{id}")
-    public Response getCityById(@PathParam("id") Long id) {
+    public Response getCityById(@PathParam("id") String id) {
         City city = cityService.getCityById(id);
         if (city == null) {
             return Response.status(404)
@@ -59,7 +59,7 @@ public class CityResource {
 
     @PUT
     @Path("/{id}")
-    public Response updateCity(@PathParam("id") Long id, @Valid City city) {
+    public Response updateCity(@PathParam("id") String id, @Valid City city) {
         try {
             City updated = cityService.updateCity(id, city);
             if (updated == null) {
@@ -77,7 +77,7 @@ public class CityResource {
 
     @DELETE
     @Path("/{id}")
-    public Response deleteCity(@PathParam("id") Long id) {
+    public Response deleteCity(@PathParam("id") String id) {
         boolean deleted = cityService.deleteCity(id);
         if (!deleted) {
             return Response.status(404)
@@ -131,4 +131,3 @@ public class CityResource {
         return Response.ok(city).build();
     }
 }
-

@@ -1,46 +1,37 @@
 package ru.ifmo.collectionmanagingservice.model;
 
-import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.bson.types.ObjectId;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity
-@Table(name = "cities")
 public class City {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Min(1)
-    private Long id;
+    private ObjectId _id;
+
+    private String id;
 
     @NotNull
     @NotEmpty
-    @Column(nullable = false)
     private String name;
 
     @NotNull
     @Valid
-    @Embedded
     private Coordinates coordinates;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate;
 
     @NotNull
     @Min(1)
-    @Column(nullable = false)
     private Integer area;
 
     @NotNull
     @Min(1)
-    @Column(nullable = false)
     private Integer population;
 
-    @Column(name = "meters_above_sea_level")
     private Integer metersAboveSeaLevel;
 
     private Boolean capital;
@@ -48,62 +39,120 @@ public class City {
     private Float agglomeration;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Climate climate;
 
     @NotNull
     @Valid
-    @Embedded
     private Human governor;
 
-    @PrePersist
-    protected void onCreate() {
+    public City() {
         if (creationDate == null) {
             creationDate = LocalDate.now();
         }
     }
 
-    public City() {}
+    public ObjectId get_id() {
+        return _id;
+    }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void set_id(ObjectId _id) {
+        this._id = _id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getId() {
+        return id;
+    }
 
-    public Coordinates getCoordinates() { return coordinates; }
-    public void setCoordinates(Coordinates coordinates) { this.coordinates = coordinates; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public LocalDate getCreationDate() { return creationDate; }
-    public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
+    public String getName() {
+        return name;
+    }
 
-    public Integer getArea() { return area; }
-    public void setArea(Integer area) { this.area = area; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Integer getPopulation() { return population; }
-    public void setPopulation(Integer population) { this.population = population; }
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
 
-    public Integer getMetersAboveSeaLevel() { return metersAboveSeaLevel; }
-    public void setMetersAboveSeaLevel(Integer meters) { this.metersAboveSeaLevel = meters; }
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
 
-    public Boolean getCapital() { return capital; }
-    public void setCapital(Boolean capital) { this.capital = capital; }
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
 
-    public Float getAgglomeration() { return agglomeration; }
-    public void setAgglomeration(Float agglomeration) { this.agglomeration = agglomeration; }
+    public void setCreationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+    }
 
-    public Climate getClimate() { return climate; }
-    public void setClimate(Climate climate) { this.climate = climate; }
+    public Integer getArea() {
+        return area;
+    }
 
-    public Human getGovernor() { return governor; }
-    public void setGovernor(Human governor) { this.governor = governor; }
+    public void setArea(Integer area) {
+        this.area = area;
+    }
+
+    public Integer getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Integer population) {
+        this.population = population;
+    }
+
+    public Integer getMetersAboveSeaLevel() {
+        return metersAboveSeaLevel;
+    }
+
+    public void setMetersAboveSeaLevel(Integer meters) {
+        this.metersAboveSeaLevel = meters;
+    }
+
+    public Boolean getCapital() {
+        return capital;
+    }
+
+    public void setCapital(Boolean capital) {
+        this.capital = capital;
+    }
+
+    public Float getAgglomeration() {
+        return agglomeration;
+    }
+
+    public void setAgglomeration(Float agglomeration) {
+        this.agglomeration = agglomeration;
+    }
+
+    public Climate getClimate() {
+        return climate;
+    }
+
+    public void setClimate(Climate climate) {
+        this.climate = climate;
+    }
+
+    public Human getGovernor() {
+        return governor;
+    }
+
+    public void setGovernor(Human governor) {
+        this.governor = governor;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         City city = (City) o;
         return Objects.equals(id, city.id);
     }
@@ -113,4 +162,3 @@ public class City {
         return Objects.hash(id);
     }
 }
-

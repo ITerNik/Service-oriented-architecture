@@ -1,193 +1,284 @@
 package ru.ifmo.collectionmanagingservice.repository;
 
-import ru.ifmo.collectionmanagingservice.model.City;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.*;
-import jakarta.persistence.criteria.*;
-import jakarta.transaction.Transactional;
+import jakarta.inject.Inject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+import ru.ifmo.collectionmanagingservice.config.MongoDBProducer;
+import ru.ifmo.collectionmanagingservice.model.City;
 import ru.ifmo.collectionmanagingservice.model.Climate;
+import ru.ifmo.collectionmanagingservice.model.Coordinates;
+import ru.ifmo.collectionmanagingservice.model.Human;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.util.*;
 
 @ApplicationScoped
 public class CityRepository {
 
-    @PersistenceContext(unitName = "cityPU")
-    private EntityManager em;
+    @Inject
+    private MongoDBProducer mongoDBProducer;
 
-    @Transactional
-    public City save(City city) {
-        if (city.getId() == null) {
-            em.persist(city);
-            em.flush(); // Force ID generation
-            return city;
-        } else {
-            return em.merge(city);
-        }
+    private MongoCollection<Document> getCollection() {
+        MongoClient mongoClient = mongoDBProducer.createMongoClient();
+        MongoDatabase database = mongoClient.getDatabase("citydb");
+        return database.getCollection("cities");
     }
 
-    public Optional<City> findById(Long id) {
-        City city = em.find(City.class, id);
-        return Optional.ofNullable(city);
+    public City save(City city) {
+        MongoCollection<Document> collection = getCollection();
+
+        if (city.getId() == null) {
+            city.setId(new ObjectId().toString());
+        }
+
+        Document doc = cityToDocument(city);
+
+        Document existing = collection.find(Filters.eq("_id", city.getId())).first();
+        if (existing != null) {
+            collection.replaceOne(Filters.eq("_id", city.getId()), doc);
+        } else {
+            collection.insertOne(doc);
+        }
+
+        return city;
+    }
+
+    public Optional<City> findById(String id) {
+        MongoCollection<Document> collection = getCollection();
+        Document doc = collection.find(Filters.eq("_id", id)).first();
+        return Optional.ofNullable(doc).map(this::documentToCity);
     }
 
     public List<City> findAll() {
-        return em.createQuery("SELECT c FROM City c", City.class).getResultList();
-    }
-
-    public List<City> findWithPaginationAndSorting(int page, int size, String sort) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<City> cq = cb.createQuery(City.class);
-        Root<City> city = cq.from(City.class);
-
-        if (sort != null && !sort.isEmpty()) {
-            String[] sortFields = sort.split(",");
-            for (String field : sortFields) {
-                boolean desc = field.startsWith("-");
-                String fieldName = desc ? field.substring(1) : field;
-
-                Path<?> path = getPath(city, fieldName);
-                if (desc) {
-                    cq.orderBy(cb.desc(path));
-                } else {
-                    cq.orderBy(cb.asc(path));
-                }
-            }
-        }
-
-        TypedQuery<City> query = em.createQuery(cq);
-        query.setFirstResult(page * size);
-        query.setMaxResults(size);
-
-        return query.getResultList();
+        MongoCollection<Document> collection = getCollection();
+        List<City> cities = new ArrayList<>();
+        collection.find().forEach(doc -> cities.add(documentToCity(doc)));
+        return cities;
     }
 
     public List<City> findWithFilters(int page, int size, String sort,
-                                      java.util.Map<String, String> filters) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<City> cq = cb.createQuery(City.class);
-        Root<City> city = cq.from(City.class);
+            Map<String, String> filters) {
+        MongoCollection<Document> collection = getCollection();
 
-        Predicate predicate = cb.conjunction();
+        List<Bson> filterList = new ArrayList<>();
 
-        for (java.util.Map.Entry<String, String> entry : filters.entrySet()) {
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            if (value == null || value.isEmpty()) continue;
-            if (key.equals("page") || key.equals("size") || key.equals("sort")) continue;
+            if (value == null || value.isEmpty())
+                continue;
+            if (key.equals("page") || key.equals("size") || key.equals("sort"))
+                continue;
 
             switch (key) {
                 case "name":
-                    predicate = cb.and(predicate,
-                            cb.like(cb.lower(city.get("name")),
-                                    "%" + value.toLowerCase() + "%"));
+                    filterList.add(Filters.regex("name", ".*" + value + ".*", "i"));
                     break;
                 case "population":
-                    predicate = cb.and(predicate,
-                            cb.equal(city.get("population"), Integer.valueOf(value)));
+                    filterList.add(Filters.eq("population", Integer.valueOf(value)));
                     break;
                 case "area":
-                    predicate = cb.and(predicate,
-                            cb.equal(city.get("area"), Integer.valueOf(value)));
+                    filterList.add(Filters.eq("area", Integer.valueOf(value)));
                     break;
                 case "climate":
-                    predicate = cb.and(predicate,
-                            cb.equal(city.get("climate"),
-                                    Climate.valueOf(value)));
+                    filterList.add(Filters.eq("climate", value));
                     break;
                 case "capital":
-                    predicate = cb.and(predicate,
-                            cb.equal(city.get("capital"), Boolean.valueOf(value)));
+                    filterList.add(Filters.eq("capital", Boolean.valueOf(value)));
+                    break;
+                case "metersAboveSeaLevel":
+                    filterList.add(Filters.eq("metersAboveSeaLevel", Integer.valueOf(value)));
                     break;
             }
         }
 
-        cq.where(predicate);
+        Bson filter = filterList.isEmpty() ? new Document() : Filters.and(filterList);
 
-        if (sort != null && !sort.isEmpty()) {
-            String[] sortFields = sort.split(",");
-            java.util.List<Order> orders = new java.util.ArrayList<>();
+        Bson sortBson = buildSort(sort);
 
-            for (String field : sortFields) {
-                boolean desc = field.startsWith("-");
-                String fieldName = desc ? field.substring(1) : field;
+        List<City> cities = new ArrayList<>();
+        collection.find(filter)
+                .sort(sortBson)
+                .skip(page * size)
+                .limit(size)
+                .forEach(doc -> cities.add(documentToCity(doc)));
 
-                Path<?> path = getPath(city, fieldName);
-                if (desc) {
-                    orders.add(cb.desc(path));
-                } else {
-                    orders.add(cb.asc(path));
-                }
-            }
-            cq.orderBy(orders);
-        }
-
-        TypedQuery<City> query = em.createQuery(cq);
-        query.setFirstResult(page * size);
-        query.setMaxResults(size);
-
-        return query.getResultList();
+        return cities;
     }
 
-    private Path<?> getPath(Root<City> root, String fieldName) {
+    private Bson buildSort(String sort) {
+        if (sort == null || sort.isEmpty()) {
+            return Sorts.ascending("_id");
+        }
+
+        String[] sortFields = sort.split(",");
+        List<Bson> sorts = new ArrayList<>();
+
+        for (String field : sortFields) {
+            boolean desc = field.startsWith("-");
+            String fieldName = desc ? field.substring(1) : field;
+
+            String mongoField = mapFieldName(fieldName);
+
+            if (desc) {
+                sorts.add(Sorts.descending(mongoField));
+            } else {
+                sorts.add(Sorts.ascending(mongoField));
+            }
+        }
+
+        return sorts.size() == 1 ? sorts.get(0) : Sorts.orderBy(sorts);
+    }
+
+    private String mapFieldName(String fieldName) {
         switch (fieldName) {
             case "id":
-            case "name":
-            case "area":
-            case "population":
-            case "creationDate":
-            case "climate":
-            case "capital":
-            case "agglomeration":
-            case "metersAboveSeaLevel":
-                return root.get(fieldName);
+                return "_id";
             default:
-                return root.get("id");
+                return fieldName;
         }
     }
 
-    @Transactional
     public void delete(City city) {
-        em.remove(em.contains(city) ? city : em.merge(city));
+        MongoCollection<Document> collection = getCollection();
+        collection.deleteOne(Filters.eq("_id", city.getId()));
     }
 
-    @Transactional
-    public boolean deleteById(Long id) {
-        return findById(id).map(city -> {
-            delete(city);
-            return true;
-        }).orElse(false);
+    public boolean deleteById(String id) {
+        MongoCollection<Document> collection = getCollection();
+        return collection.deleteOne(Filters.eq("_id", id)).getDeletedCount() > 0;
     }
 
     public Optional<City> findCityWithMinName() {
-        return em.createQuery(
-                        "SELECT c FROM City c ORDER BY c.name ASC", City.class)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst();
+        MongoCollection<Document> collection = getCollection();
+        Document doc = collection.find()
+                .sort(Sorts.ascending("name"))
+                .limit(1)
+                .first();
+        return Optional.ofNullable(doc).map(this::documentToCity);
     }
 
     public Optional<City> findCityWithMaxClimate() {
-        return em.createQuery(
-                        "SELECT c FROM City c ORDER BY c.climate DESC", City.class)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst();
+        MongoCollection<Document> collection = getCollection();
+        Document doc = collection.find()
+                .sort(Sorts.descending("climate"))
+                .limit(1)
+                .first();
+        return Optional.ofNullable(doc).map(this::documentToCity);
     }
 
     public Optional<City> findFirstByMetersLessThan(Integer meters) {
-        return em.createQuery(
-                        "SELECT c FROM City c WHERE c.metersAboveSeaLevel < :meters", City.class)
-                .setParameter("meters", meters)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst();
+        MongoCollection<Document> collection = getCollection();
+        Document doc = collection.find(Filters.lt("metersAboveSeaLevel", meters))
+                .limit(1)
+                .first();
+        return Optional.ofNullable(doc).map(this::documentToCity);
     }
 
     public long count() {
-        return em.createQuery("SELECT COUNT(c) FROM City c", Long.class)
-                .getSingleResult();
+        MongoCollection<Document> collection = getCollection();
+        return collection.countDocuments();
+    }
+
+    private Document cityToDocument(City city) {
+        Document doc = new Document();
+        doc.put("_id", city.getId());
+        doc.put("name", city.getName());
+
+        if (city.getCoordinates() != null) {
+            Document coords = new Document();
+            coords.put("x", city.getCoordinates().getX());
+            coords.put("y", city.getCoordinates().getY());
+            doc.put("coordinates", coords);
+        }
+
+        if (city.getCreationDate() != null) {
+            doc.put("creationDate", Date.from(city.getCreationDate()
+                    .atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
+
+        doc.put("area", city.getArea());
+        doc.put("population", city.getPopulation());
+        doc.put("metersAboveSeaLevel", city.getMetersAboveSeaLevel());
+        doc.put("agglomeration", city.getAgglomeration());
+        doc.put("capital", city.getCapital());
+
+        if (city.getClimate() != null) {
+            doc.put("climate", city.getClimate().name());
+        }
+
+        if (city.getGovernor() != null) {
+            Document governor = new Document();
+            governor.put("height", city.getGovernor().getHeight());
+            doc.put("governor", governor);
+        }
+
+        return doc;
+    }
+
+    private City documentToCity(Document doc) {
+        City city = new City();
+        city.setId(doc.getString("_id"));
+        city.setName(doc.getString("name"));
+
+        Document coordsDoc = doc.get("coordinates", Document.class);
+        if (coordsDoc != null) {
+            Coordinates coords = new Coordinates();
+            coords.setX(coordsDoc.getDouble("x"));
+            coords.setY(coordsDoc.getDouble("y"));
+            city.setCoordinates(coords);
+        }
+
+        Date creationDate = doc.getDate("creationDate");
+        if (creationDate != null) {
+            city.setCreationDate(creationDate.toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDate());
+        }
+
+        city.setArea(doc.getInteger("area"));
+        city.setPopulation(doc.getInteger("population"));
+        city.setMetersAboveSeaLevel(doc.getInteger("metersAboveSeaLevel"));
+
+        Object agglomeration = doc.get("agglomeration");
+        if (agglomeration != null) {
+            if (agglomeration instanceof Double) {
+                city.setAgglomeration(((Double) agglomeration).floatValue());
+            } else if (agglomeration instanceof Float) {
+                city.setAgglomeration((Float) agglomeration);
+            } else if (agglomeration instanceof Integer) {
+                city.setAgglomeration(((Integer) agglomeration).floatValue());
+            }
+        }
+
+        city.setCapital(doc.getBoolean("capital"));
+
+        String climateStr = doc.getString("climate");
+        if (climateStr != null) {
+            city.setClimate(Climate.valueOf(climateStr));
+        }
+
+        Document governorDoc = doc.get("governor", Document.class);
+        if (governorDoc != null) {
+            Human governor = new Human();
+            Object height = governorDoc.get("height");
+            if (height != null) {
+                if (height instanceof Double) {
+                    governor.setHeight((Double) height);
+                } else if (height instanceof Integer) {
+                    governor.setHeight(((Integer) height).doubleValue());
+                }
+            }
+            city.setGovernor(governor);
+        }
+
+        return city;
     }
 }

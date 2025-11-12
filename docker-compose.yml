@@ -1,16 +1,9 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: soa_postgres
+  mongodb:
+    image: mongo:8.2.1
+    container_name: soa_mongodb
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: serviceoriented
+      MONGO_INITDB_DATABASE: citydb
     ports:
-      - "5432:5432"
-    volumes:
-      - soa_pg_data:/var/lib/postgresql/data
-
-volumes:
-  soa_pg_data:
+      - "27017:27017"
