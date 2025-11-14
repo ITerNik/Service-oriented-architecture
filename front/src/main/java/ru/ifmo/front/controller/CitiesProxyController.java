@@ -9,6 +9,8 @@ import ru.ifmo.front.client.CityServiceSoapClient;
 import ru.ifmo.front.model.City;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/cities")
@@ -24,8 +26,17 @@ public class CitiesProxyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String filters) {
+            @RequestParam Map<String, String> allParams) {
         try {
+            String filters = allParams.entrySet().stream()
+                    .filter(e -> !e.getKey().equals("page") && !e.getKey().equals("size") && !e.getKey().equals("sort"))
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("&"));
+
+            if (filters.isEmpty()) {
+                filters = null;
+            }
+
             logger.debug("Getting cities: page={}, size={}, sort={}, filters={}", page, size, sort, filters);
             List<City> cities = cityServiceSoapClient.getCities(page, size, sort, filters);
             logger.debug("Retrieved {} cities", cities != null ? cities.size() : 0);
