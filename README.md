@@ -30,3 +30,37 @@ Starts PostgreSQL and three WildFly instances. Stops them after testing.
 ```bash
 ssh -L 8080:localhost:8080 server918r818
 ```
+
+### SOAP Endpoints
+
+WSDL - `http://localhost:8080/CityService/CityWebService?wsdl`
+
+POST `http://localhost:8080/CityService/CityWebService`
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+                  xmlns:coll="http://collectionmanagingservice.ifmo.ru/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <coll:createCity>
+         <city>
+            <name>Amsterdam</name>
+            <coordinates>
+               <x>4.9</x>
+               <y>52.37</y>
+            </coordinates>
+            <area>219</area>
+            <population>872680</population>
+            <metersAboveSeaLevel>-2</metersAboveSeaLevel>
+            <capital>true</capital>
+            <agglomeration>2.4</agglomeration>
+            <climate>HUMIDCONTINENTAL</climate>
+            <governor>
+               <height>180.0</height>
+               <birthday>1970-01-01</birthday>
+            </governor>
+         </city>
+      </coll:createCity>
+   </soapenv:Body>
+</soapenv:Envelope>
+```

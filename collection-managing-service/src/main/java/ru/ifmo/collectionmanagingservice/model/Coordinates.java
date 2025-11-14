@@ -1,26 +1,25 @@
 package ru.ifmo.collectionmanagingservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Embeddable
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@XmlRootElement(name = "coordinates")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"x", "y"})
 public class Coordinates {
+    @XmlElement(required = true)
     @NotNull
-    @Column(name = "coordinate_x", nullable = false)
     private Double x;
 
+    @XmlElement(required = true)
     @NotNull
     @Min(-194)
-    @Column(name = "coordinate_y", nullable = false)
     private Double y;
-
-    public Coordinates() {}
-
-    public Double getX() { return x; }
-    public void setX(Double x) { this.x = x; }
-
-    public Double getY() { return y; }
-    public void setY(Double y) { this.y = y; }
 }

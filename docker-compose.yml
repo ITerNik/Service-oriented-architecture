@@ -1,16 +1,20 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: soa_postgres
+   mongo:
+    image: mongo:latest
+    container_name: soa_mongo
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: serviceoriented
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: serviceoriented
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - soa_pg_data:/var/lib/postgresql/data
+      - soa_mongo-data:/data/db
+      - soa_mongo-config:/data/configdb
 
 volumes:
-  soa_pg_data:
+  soa_mongo-data:
+    driver: local
+  soa_mongo-config:
+    driver: local

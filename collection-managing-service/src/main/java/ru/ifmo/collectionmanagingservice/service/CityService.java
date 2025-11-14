@@ -1,33 +1,22 @@
 package ru.ifmo.collectionmanagingservice.service;
 
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import ru.ifmo.collectionmanagingservice.model.City;
-import ru.ifmo.collectionmanagingservice.repository.CityRepository;
+import ru.ifmo.collectionmanagingservice.repository.CityMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
-@ApplicationScoped
+@Stateless
 public class CityService {
     @Inject
-    private CityRepository repository;
+    private CityMongoRepository repository;
 
-    public List<City> getCities(int page, int size, String sort,
-                                MultivaluedMap<String, String> filters) {
-
-        Map<String, String> filterMap = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : filters.entrySet()) {
-            if (!entry.getValue().isEmpty()) {
-                filterMap.put(entry.getKey(), entry.getValue().get(0));
-            }
-        }
-
-        return repository.findWithFilters(page, size, sort, filterMap);
+    public List<City> getCitiesWithFilters(int page, int size, String sort, Map<String, String> filters) {
+        return repository.findWithFilters(page, size, sort, filters);
     }
 
-    @Transactional
     public City createCity(City city) {
         validateCity(city);
         city.setId(null); // Ensure ID is null for new entities
@@ -35,12 +24,11 @@ public class CityService {
         return repository.save(city);
     }
 
-    public City getCityById(Long id) {
+    public City getCityById(String id) {
         return repository.findById(id).orElse(null);
     }
 
-    @Transactional
-    public City updateCity(Long id, City city) {
+    public City updateCity(String id, City city) {
         Optional<City> existing = repository.findById(id);
         if (existing.isEmpty()) {
             return null;
@@ -52,17 +40,15 @@ public class CityService {
         return repository.save(city);
     }
 
-    @Transactional
-    public boolean deleteCity(Long id) {
+    public boolean deleteCity(String id) {
         return repository.deleteById(id);
     }
 
-    @Transactional
     public boolean deleteCityByMeters(Integer meters) {
         Optional<City> toDelete = repository.findFirstByMetersLessThan(meters);
 
         if (toDelete.isPresent()) {
-            repository.delete(toDelete.get());
+            repository.deleteById(toDelete.get().getId());
             return true;
         }
         return false;
