@@ -19,9 +19,28 @@ public class CityWebServiceImpl implements CityWebService {
 
     @Override
     public List<City> getCities(int page, int size, String sort, String filters) {
-        MultivaluedMap<String, String> filterMap = new MultivaluedHashMap<>();
-        // Parse filters string if needed (can be empty for now)
+        MultivaluedMap<String, String> filterMap = parseFilters(filters);
         return cityService.getCities(page, size, sort, filterMap);
+    }
+
+    MultivaluedHashMap<String, String> parseFilters(String filters) {
+        MultivaluedMap<String, String> filterMap = new MultivaluedHashMap<>();
+
+        if (filters != null && !filters.trim().isEmpty()) {
+            String[] pairs = filters.split("&");
+            for (String pair : pairs) {
+                String[] keyValue = pair.split("=", 2);
+                if (keyValue.length == 2) {
+                    String key = keyValue[0].trim();
+                    String value = keyValue[1].trim();
+                    if (!key.isEmpty() && !value.isEmpty()) {
+                        filterMap.add(key, value);
+                    }
+                }
+            }
+        }
+
+        return (MultivaluedHashMap<String, String>) filterMap;
     }
 
     @Override
