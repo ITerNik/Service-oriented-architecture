@@ -7,6 +7,7 @@ import ru.ifmo.calculatingservice.model.City;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteService {
@@ -37,11 +38,19 @@ public class RouteService {
             return 0.0;
         }
 
-        City oldest = cities.stream()
+        List<City> valid = cities.stream()
+                .filter(c -> c != null && c.getCreationDate() != null && c.getCoordinates() != null)
+                .collect(Collectors.toList());
+
+        if (valid.size() < 2) {
+            return 0.0;
+        }
+
+        City oldest = valid.stream()
                 .min(Comparator.comparing(City::getCreationDate))
                 .orElseThrow();
 
-        City newest = cities.stream()
+        City newest = valid.stream()
                 .max(Comparator.comparing(City::getCreationDate))
                 .orElseThrow();
 
