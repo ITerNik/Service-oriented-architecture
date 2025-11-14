@@ -18,6 +18,14 @@ public class CityService {
 
         Map<String, String> filterMap = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : filters.entrySet()) {
+            if (entry.getKey().equals("population") || entry.getKey().equals("area")
+                    || entry.getKey().equals("metersAboveSeaLevel")) {
+                try {
+                    Integer.parseInt(entry.getValue().get(0));
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+            }
             if (!entry.getValue().isEmpty()) {
                 filterMap.put(entry.getKey(), entry.getValue().get(0));
             }
