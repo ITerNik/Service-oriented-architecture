@@ -1,39 +1,27 @@
 package ru.ifmo.calculatingservice.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.ifmo.calculatingservice.client.CityServiceSoapClient;
 import ru.ifmo.calculatingservice.model.City;
 
-import java.util.Arrays;
-import org.springframework.web.client.RestTemplate;
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class RouteService {
 
-    @Value("${collection-managing-service.url}")
-    private String service1Url;
-
-    private final RestTemplate restTemplate;
-
-    public RouteService() {
-        this.restTemplate = createRestTemplate();
-    }
-
-    private RestTemplate createRestTemplate() {
-        return new RestTemplate();
-    }
+    @Autowired
+    private CityServiceSoapClient cityServiceClient;
 
     public double calculateToMaxPopulated() {
-        String url = service1Url + "/cities?size=1000";
-        City[] cities = restTemplate.getForObject(url, City[].class);
+        List<City> cities = cityServiceClient.getCities(0, 1000, null, null);
 
-        if (cities == null || cities.length == 0) {
+        if (cities == null || cities.isEmpty()) {
             return 0.0;
         }
 
-        City maxPopulated = Arrays.stream(cities)
+        City maxPopulated = cities.stream()
                 .max(Comparator.comparing(City::getPopulation))
                 .orElseThrow();
 
@@ -43,20 +31,17 @@ public class RouteService {
     }
 
     public double calculateBetweenOldestAndNewest() {
-        String url = service1Url + "/cities?size=1000";
-        City[] cities = restTemplate.getForObject(url, City[].class);
+        List<City> cities = cityServiceClient.getCities(0, 1000, null, null);
 
-        if (cities == null || cities.length < 2) {
+        if (cities == null || cities.size() < 2) {
             return 0.0;
         }
 
-        List<City> cityList = Arrays.asList(cities);
-
-        City oldest = cityList.stream()
+        City oldest = cities.stream()
                 .min(Comparator.comparing(City::getCreationDate))
                 .orElseThrow();
 
-        City newest = cityList.stream()
+        City newest = cities.stream()
                 .max(Comparator.comparing(City::getCreationDate))
                 .orElseThrow();
 

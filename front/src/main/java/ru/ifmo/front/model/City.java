@@ -1,15 +1,16 @@
-package ru.ifmo.calculatingservice.model;
+package ru.ifmo.front.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import ru.ifmo.calculatingservice.adapter.LocalDateAdapter;
+import ru.ifmo.front.adapter.LocalDateAdapter;
 
 import java.time.LocalDate;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class City {
+
     private String id;
     private String name;
     private Coordinates coordinates;
@@ -25,6 +26,9 @@ public class City {
     private Float agglomeration;
     private Climate climate;
     private Human governor;
+
+    public City() {
+    }
 
     public String getId() {
         return id;

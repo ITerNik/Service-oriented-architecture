@@ -1,67 +1,41 @@
 package ru.ifmo.front.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.net.URI;
-import java.util.Enumeration;
+import ru.ifmo.front.client.RouteServiceSoapClient;
+import ru.ifmo.front.model.DistanceResponse;
 
 @RestController
-@RequestMapping("/route")
+@RequestMapping("api/route")
 public class RouteProxyController {
 
-    @Value("${backend.service2.url}")
-    private String service2Url;
+    private static final Logger logger = LoggerFactory.getLogger(RouteProxyController.class);
 
-    private final RestTemplate restTemplate;
+    @Autowired
+    private RouteServiceSoapClient routeServiceSoapClient;
 
-    public RouteProxyController() {
-        this.restTemplate = new RestTemplate();
+    @GetMapping("/calculate/to-max-populated")
+    public ResponseEntity<DistanceResponse> calculateToMaxPopulated() {
+        try {
+            Double distance = routeServiceSoapClient.calculateToMaxPopulated();
+            return ResponseEntity.ok(new DistanceResponse(distance));
+        } catch (Exception e) {
+            logger.error("Error calculating distance to max populated city", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @RequestMapping(value = "/**", method = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
-            RequestMethod.DELETE, RequestMethod.PATCH })
-    public ResponseEntity<String> proxyRequest(
-            HttpServletRequest request,
-            @RequestBody(required = false) String body) {
-
+    @GetMapping("/calculate/between-oldest-and-newest")
+    public ResponseEntity<DistanceResponse> calculateBetweenOldestAndNewest() {
         try {
-            String path = request.getRequestURI();
-
-            String queryString = request.getQueryString();
-            String fullPath = path;
-            if (queryString != null && !queryString.isEmpty()) {
-                fullPath = path + "?" + queryString;
-            }
-
-            String targetUrl = service2Url + fullPath;
-
-            HttpHeaders headers = new HttpHeaders();
-            Enumeration<String> headerNames = request.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                if (!headerName.equalsIgnoreCase("host") &&
-                        !headerName.equalsIgnoreCase("content-length")) {
-                    headers.add(headerName, request.getHeader(headerName));
-                }
-            }
-
-            HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(
-                    URI.create(targetUrl),
-                    HttpMethod.valueOf(request.getMethod()),
-                    entity,
-                    String.class);
-
-            return response;
-
+            Double distance = routeServiceSoapClient.calculateBetweenOldestAndNewest();
+            return ResponseEntity.ok(new DistanceResponse(distance));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"error\": \"" + e.getMessage() + "\"}");
+            logger.error("Error calculating distance between oldest and newest cities", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

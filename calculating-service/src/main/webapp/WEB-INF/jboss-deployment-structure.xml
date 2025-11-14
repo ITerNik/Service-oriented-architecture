@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-deployment-structure>
     <deployment>
+        <!-- Exclude WildFly's webservices subsystem to use embedded Apache CXF -->
+        <exclude-subsystems>
+            <subsystem name="webservices" />
+        </exclude-subsystems>
         <!-- Use WildFly's logging infrastructure (JBoss LogManager) -->
-        <!-- No exclusions needed - Spring Boot will use SLF4J API, WildFly provides implementation -->
+        <!-- No logging exclusions needed - Spring Boot will use SLF4J API, WildFly provides implementation -->
     </deployment>
 </jboss-deployment-structure>
+
