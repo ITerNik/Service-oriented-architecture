@@ -40,14 +40,23 @@ services:
     depends_on:
       - postgres
 
-  haproxy:
+  haproxy1:
     build:
       context: .
       dockerfile: Dockerfile.haproxy1
-    container_name: soa_haproxy
+    container_name: soa_haproxy1
     restart: always
     ports:
       - "34566:8443"
+
+  haproxy2:
+    build:
+      context: .
+      dockerfile: Dockerfile.haproxy2
+    container_name: soa_haproxy2
+    restart: always
+    ports:
+      - "23442:8443"
 
 volumes:
   soa_pg_data:
