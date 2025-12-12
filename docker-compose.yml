@@ -12,14 +12,12 @@ services:
     volumes:
       - soa_pg_data:/var/lib/postgresql/data
 
-  web1:
+  web11:
     build:
       context: ./web1
       dockerfile: Dockerfile
-    container_name: soa_web1
+    container_name: soa_web11
     restart: always
-    ports:
-      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/serviceoriented
@@ -27,6 +25,29 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       - postgres
+
+  web12:
+    build:
+      context: ./web1
+      dockerfile: Dockerfile
+    container_name: soa_web12
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/serviceoriented
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+
+  haproxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.haproxy1
+    container_name: soa_haproxy
+    restart: always
+    ports:
+      - "34566:8443"
 
 volumes:
   soa_pg_data:
