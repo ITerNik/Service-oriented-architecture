@@ -1,1 +1,3 @@
 rootProject.name = 'soa'
+
+include 'web1'
