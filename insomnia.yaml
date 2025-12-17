@@ -535,5 +535,5 @@ environments:
     modified: 1760667337429
     isPrivate: false
   data:
-    service1_url: https://localhost:34566/collection-managing-service-1.0-SNAPSHOT/api
-    service2_url: https://localhost:23442/collection-managing-service-1.0-SNAPSHOT/api
+    service1_url: https://localhost:34566
+    service2_url: https://localhost:23442
