@@ -1,6 +1,6 @@
 FROM quay.io/wildfly/wildfly:latest-jdk17
 
-COPY web2/build/libs/calculating-service.war /opt/jboss/wildfly/standalone/deployments/
+COPY web2-ear/build/libs/calculating-service.ear /opt/jboss/wildfly/standalone/deployments/
 COPY certs/app2/truststore.jks /opt/jboss/wildfly/standalone/configuration/truststore.jks
 
 EXPOSE 8080

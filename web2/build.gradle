@@ -36,8 +36,13 @@ dependencies {
 	
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	
+	compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+	
+	compileOnly project(':web2-ejb')
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-core'
+	testImplementation project(':web2-ejb')
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

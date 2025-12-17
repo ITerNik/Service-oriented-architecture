@@ -3,9 +3,6 @@ package ru.ifmo.calculatingservice.ejb;
 import jakarta.ejb.Stateless;
 import java.util.Comparator;
 import java.util.List;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import ru.ifmo.calculatingservice.model.City;
 import ru.ifmo.calculatingservice.model.PageResponse;
@@ -17,52 +14,72 @@ public class RouteCalculatorBean implements RouteCalculatorRemote {
 
     @Override
     public double calculateToMaxPopulated(String serviceUrl) {
-        String url = serviceUrl + "/cities?size=1000";
-        ResponseEntity<PageResponse<City>> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+        try {
+            String fullUrl = serviceUrl + "/cities?page=1&size=100";
+            PageResponse response = restTemplate.getForObject(fullUrl, PageResponse.class);
+            if (response == null
+                    || response.getContent() == null
+                    || response.getContent().isEmpty()) {
+                return 0.0;
+            }
 
-        List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
+            List<City> cities = response.getContent();
+            City maxPopulated = cities.stream()
+                    .max(Comparator.comparing(City::getPopulation))
+                    .orElse(null);
 
-        if (cities == null || cities.isEmpty()) {
-            return 0.0;
+            if (maxPopulated == null) {
+                return 0.0;
+            }
+
+            City startCity = cities.get(0);
+            return calculateDistance(
+                    startCity.getCoordinates().getX(),
+                    startCity.getCoordinates().getY(),
+                    maxPopulated.getCoordinates().getX(),
+                    maxPopulated.getCoordinates().getY());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate distance to max populated city", e);
         }
-
-        City maxPopulated =
-                cities.stream().max(Comparator.comparing(City::getPopulation)).orElseThrow();
-
-        return calculateDistance(
-                0,
-                0,
-                maxPopulated.getCoordinates().getX(),
-                maxPopulated.getCoordinates().getY());
     }
 
     @Override
     public double calculateBetweenOldestAndNewest(String serviceUrl) {
-        String url = serviceUrl + "/cities?size=1000";
-        ResponseEntity<PageResponse<City>> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+        try {
+            String fullUrl = serviceUrl + "/cities?page=1&size=100";
+            PageResponse response = restTemplate.getForObject(fullUrl, PageResponse.class);
+            if (response == null
+                    || response.getContent() == null
+                    || response.getContent().isEmpty()) {
+                return 0.0;
+            }
 
-        List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
+            List<City> cities = response.getContent();
+            City oldest = cities.stream()
+                    .min(Comparator.comparing(City::getCreationDate))
+                    .orElse(null);
 
-        if (cities == null || cities.size() < 2) {
-            return 0.0;
+            City newest = cities.stream()
+                    .max(Comparator.comparing(City::getCreationDate))
+                    .orElse(null);
+
+            if (oldest == null || newest == null) {
+                return 0.0;
+            }
+
+            return calculateDistance(
+                    oldest.getCoordinates().getX(),
+                    oldest.getCoordinates().getY(),
+                    newest.getCoordinates().getX(),
+                    newest.getCoordinates().getY());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate distance between oldest and newest cities", e);
         }
-
-        City oldest =
-                cities.stream().min(Comparator.comparing(City::getCreationDate)).orElseThrow();
-
-        City newest =
-                cities.stream().max(Comparator.comparing(City::getCreationDate)).orElseThrow();
-
-        return calculateDistance(
-                oldest.getCoordinates().getX(),
-                oldest.getCoordinates().getY(),
-                newest.getCoordinates().getX(),
-                newest.getCoordinates().getY());
     }
 
-    private double calculateDistance(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    private double calculateDistance(Double x1, Double y1, Double x2, Double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 }

@@ -1,0 +1,31 @@
+plugins {
+    id 'ear'
+}
+
+group = 'ru.ifmo'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    deploy project(path: ':web2', configuration: 'archives')
+    deploy project(path: ':web2-ejb', configuration: 'archives')
+    
+    earlib 'org.springframework:spring-web:6.2.2'
+    earlib 'org.springframework:spring-beans:6.2.2'
+    earlib 'org.springframework:spring-core:6.2.2'
+    earlib 'org.springframework:spring-jcl:6.2.2'
+    earlib 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    earlib 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+    earlib 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+}
+
+ear {
+    archiveFileName = 'calculating-service.ear'
+    deploymentDescriptor {
+        applicationName = 'calculating-service'
+        webModule('web2-0.0.1-SNAPSHOT-plain.war', '/')
+    }
+}
