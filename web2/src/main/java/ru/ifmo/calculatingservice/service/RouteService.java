@@ -1,13 +1,12 @@
 package ru.ifmo.calculatingservice.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import ru.ifmo.calculatingservice.model.City;
-
 import java.util.Arrays;
-import org.springframework.web.client.RestTemplate;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ru.ifmo.calculatingservice.model.City;
 
 @Service
 public class RouteService {
@@ -37,7 +36,9 @@ public class RouteService {
                 .max(Comparator.comparing(City::getPopulation))
                 .orElseThrow();
 
-        return calculateDistance(0, 0,
+        return calculateDistance(
+                0,
+                0,
                 maxPopulated.getCoordinates().getX(),
                 maxPopulated.getCoordinates().getY());
     }
