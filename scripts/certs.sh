@@ -26,10 +26,10 @@ echo "Generating keystores and truststores for: $APP1_NAME, $APP2_NAME, $APP3_NA
 gen_node() {
   local name="$1"
   local dir="$OUT_DIR/$name"
-  echo "- Generating keystore for $name (CN=localhost, SAN=localhost,127.0.0.1)"
+  echo "- Generating keystore for $name (CN=localhost, SAN=localhost,haproxy1,haproxy2,127.0.0.1)"
   keytool -genkeypair -alias server -keyalg RSA -keysize 2048 -validity 3650 \
     -dname "CN=localhost,OU=soa2,O=Example,L=City,ST=State,C=US" \
-    -ext SAN=DNS:localhost,IP:127.0.0.1 \
+    -ext SAN=DNS:localhost,DNS:haproxy1,DNS:haproxy2,IP:127.0.0.1 \
     -keystore "$dir/keystore.jks" -storepass "$PASS" -keypass "$PASS"
   keytool -exportcert -alias server -file "$dir/server.crt" -keystore "$dir/keystore.jks" -storepass "$PASS"
 }
@@ -69,31 +69,33 @@ import_cert_into_trust "$APP2_NAME" "$APP3_NAME"
 import_cert_into_trust "$APP3_NAME" "$APP1_NAME"
 import_cert_into_trust "$APP3_NAME" "$APP2_NAME"
 
-echo "Step 3: Deploy into WildFly servers"
+# Step 3: Deploy into WildFly servers (skipped if directories don't exist)
+if [ -d "$APP1_WF_DIR/standalone/configuration/" ]; then
+  echo "Step 3: Deploy into WildFly servers"
 
-ls -l "$OUT_DIR/$APP1_NAME/keystore.jks"
-ls -ld "$APP1_WF_DIR/standalone/configuration/"
-cp "$OUT_DIR/$APP1_NAME/keystore.jks" "$APP1_WF_DIR"/standalone/configuration/keystore.jks
-echo "Copied keystore for $APP1_NAME"
-cp "$OUT_DIR/$APP2_NAME/keystore.jks" "$APP2_WF_DIR"/standalone/configuration/keystore.jks
-cp "$OUT_DIR/$APP3_NAME/keystore.jks" "$APP3_WF_DIR"/standalone/configuration/keystore.jks
+  ls -l "$OUT_DIR/$APP1_NAME/keystore.jks"
+  ls -ld "$APP1_WF_DIR/standalone/configuration/"
+  cp "$OUT_DIR/$APP1_NAME/keystore.jks" "$APP1_WF_DIR"/standalone/configuration/keystore.jks
+  echo "Copied keystore for $APP1_NAME"
+  cp "$OUT_DIR/$APP2_NAME/keystore.jks" "$APP2_WF_DIR"/standalone/configuration/keystore.jks
+  cp "$OUT_DIR/$APP3_NAME/keystore.jks" "$APP3_WF_DIR"/standalone/configuration/keystore.jks
 
-cp "$OUT_DIR/$APP1_NAME/truststore.jks" "$APP1_WF_DIR"/standalone/configuration/truststore.jks
-cp "$OUT_DIR/$APP2_NAME/truststore.jks" "$APP2_WF_DIR"/standalone/configuration/truststore.jks
-cp "$OUT_DIR/$APP3_NAME/truststore.jks" "$APP3_WF_DIR"/standalone/configuration/truststore.jks
+  cp "$OUT_DIR/$APP1_NAME/truststore.jks" "$APP1_WF_DIR"/standalone/configuration/truststore.jks
+  cp "$OUT_DIR/$APP2_NAME/truststore.jks" "$APP2_WF_DIR"/standalone/configuration/truststore.jks
+  cp "$OUT_DIR/$APP3_NAME/truststore.jks" "$APP3_WF_DIR"/standalone/configuration/truststore.jks
 
-echo "Step 4: Add SSL configuration to standalone.conf files"
+  echo "Step 4: Add SSL configuration to standalone.conf files"
 
-add_ssl_to_standalone_conf() {
-  local wf_dir="$1"
-  local conf="$wf_dir/bin/standalone.conf"
+  add_ssl_to_standalone_conf() {
+    local wf_dir="$1"
+    local conf="$wf_dir/bin/standalone.conf"
 
-  if grep -q "javax.net.ssl.trustStore" "$conf"; then
-    echo "SSL config already exists in $conf, skipping"
-    return
-  fi
+    if grep -q "javax.net.ssl.trustStore" "$conf"; then
+      echo "SSL config already exists in $conf, skipping"
+      return
+    fi
 
-  cat >> "$conf" << 'EOF'
+    cat >> "$conf" << 'EOF'
 
 # SSL/TLS Configuration for mutual TLS (added by certs.sh)
 JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=$JBOSS_HOME/standalone/configuration/truststore.jks"
@@ -102,22 +104,22 @@ JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.keyStore=$JBOSS_HOME/standalone/configurat
 JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.keyStorePassword=changeit"
 EOF
 
-  echo "Added SSL config to $conf"
-}
+    echo "Added SSL config to $conf"
+  }
 
-add_ssl_to_standalone_conf "$APP1_WF_DIR"
-add_ssl_to_standalone_conf "$APP2_WF_DIR"
-add_ssl_to_standalone_conf "$APP3_WF_DIR"
+  add_ssl_to_standalone_conf "$APP1_WF_DIR"
+  add_ssl_to_standalone_conf "$APP2_WF_DIR"
+  add_ssl_to_standalone_conf "$APP3_WF_DIR"
 
-echo "Step 5: Configure WildFly Elytron to use our keystores"
+  echo "Step 5: Configure WildFly Elytron to use our keystores"
 
-configure_wildfly_ssl() {
-  local wf_dir="$1"
-  local standalone_xml="$wf_dir/standalone/configuration/standalone.xml"
-  
-  echo "Configuring SSL in $standalone_xml"
-  
-  sed -i '/<tls>/,/<\/tls>/c\
+  configure_wildfly_ssl() {
+    local wf_dir="$1"
+    local standalone_xml="$wf_dir/standalone/configuration/standalone.xml"
+    
+    echo "Configuring SSL in $standalone_xml"
+    
+    sed -i '/<tls>/,/<\/tls>/c\
             <tls>\
                 <key-stores>\
                     <key-store name="serverKeyStore">\
@@ -143,13 +145,16 @@ configure_wildfly_ssl() {
                     <server-ssl-context name="applicationSSC" key-manager="serverKeyManager" trust-manager="serverTrustManager"/>\
                 </server-ssl-contexts>\
             </tls>' "$standalone_xml"
-  
-  echo "Configured SSL for $wf_dir"
-}
+    
+    echo "Configured SSL for $wf_dir"
+  }
 
-configure_wildfly_ssl "$APP1_WF_DIR"
-configure_wildfly_ssl "$APP2_WF_DIR"
-configure_wildfly_ssl "$APP3_WF_DIR"
+  configure_wildfly_ssl "$APP1_WF_DIR"
+  configure_wildfly_ssl "$APP2_WF_DIR"
+  configure_wildfly_ssl "$APP3_WF_DIR"
+else
+  echo "Step 3-5: Skipping WildFly deployment (directories not found)"
+fi
 
 echo "Certs and SSL configuration completed successfully."
 

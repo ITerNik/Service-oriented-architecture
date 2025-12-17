@@ -1,18 +1,24 @@
 package ru.ifmo.calculatingservice.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import ru.ifmo.calculatingservice.model.City;
 import ru.ifmo.calculatingservice.model.Coordinates;
+import ru.ifmo.calculatingservice.model.PageResponse;
 
 public class RouteServiceTest {
 
@@ -38,7 +44,13 @@ public class RouteServiceTest {
             createCity(3L, "City3", 150000, 50.0, 60.0)
         };
 
-        when(restTemplate.getForObject(anyString(), eq(City[].class))).thenReturn(cities);
+        PageResponse<City> pageResponse = new PageResponse<>();
+        pageResponse.setContent(Arrays.asList(cities));
+
+        ResponseEntity<PageResponse<City>> responseEntity = new ResponseEntity<>(pageResponse, HttpStatus.OK);
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntity);
 
         // Execute
         double distance = routeService.calculateToMaxPopulated();
@@ -50,7 +62,13 @@ public class RouteServiceTest {
 
     @Test
     public void testCalculateToMaxPopulatedEmptyArray() {
-        when(restTemplate.getForObject(anyString(), eq(City[].class))).thenReturn(new City[] {});
+        PageResponse<City> pageResponse = new PageResponse<>();
+        pageResponse.setContent(Collections.emptyList());
+
+        ResponseEntity<PageResponse<City>> responseEntity = new ResponseEntity<>(pageResponse, HttpStatus.OK);
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntity);
 
         double distance = routeService.calculateToMaxPopulated();
 
@@ -66,7 +84,13 @@ public class RouteServiceTest {
             createCityWithDate(3L, "Middle", LocalDate.of(2021, 1, 1), 50.0, 60.0)
         };
 
-        when(restTemplate.getForObject(anyString(), eq(City[].class))).thenReturn(cities);
+        PageResponse<City> pageResponse = new PageResponse<>();
+        pageResponse.setContent(Arrays.asList(cities));
+
+        ResponseEntity<PageResponse<City>> responseEntity = new ResponseEntity<>(pageResponse, HttpStatus.OK);
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntity);
 
         // Execute
         double distance = routeService.calculateBetweenOldestAndNewest();
@@ -80,7 +104,13 @@ public class RouteServiceTest {
     public void testCalculateBetweenOldestAndNewestLessThanTwoCities() {
         City[] cities = new City[] {createCityWithDate(1L, "Only", LocalDate.now(), 10.0, 20.0)};
 
-        when(restTemplate.getForObject(anyString(), eq(City[].class))).thenReturn(cities);
+        PageResponse<City> pageResponse = new PageResponse<>();
+        pageResponse.setContent(Arrays.asList(cities));
+
+        ResponseEntity<PageResponse<City>> responseEntity = new ResponseEntity<>(pageResponse, HttpStatus.OK);
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntity);
 
         double distance = routeService.calculateBetweenOldestAndNewest();
 

@@ -1,12 +1,15 @@
 package ru.ifmo.calculatingservice.service;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.ifmo.calculatingservice.model.City;
+import ru.ifmo.calculatingservice.model.PageResponse;
 
 @Service
 public class RouteService {
@@ -26,15 +29,17 @@ public class RouteService {
 
     public double calculateToMaxPopulated() {
         String url = service1Url + "/cities?size=1000";
-        City[] cities = restTemplate.getForObject(url, City[].class);
+        ResponseEntity<PageResponse<City>> response = restTemplate.exchange(
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<PageResponse<City>>() {});
 
-        if (cities == null || cities.length == 0) {
+        List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
+
+        if (cities == null || cities.isEmpty()) {
             return 0.0;
         }
 
-        City maxPopulated = Arrays.stream(cities)
-                .max(Comparator.comparing(City::getPopulation))
-                .orElseThrow();
+        City maxPopulated =
+                cities.stream().max(Comparator.comparing(City::getPopulation)).orElseThrow();
 
         return calculateDistance(
                 0,
@@ -45,21 +50,20 @@ public class RouteService {
 
     public double calculateBetweenOldestAndNewest() {
         String url = service1Url + "/cities?size=1000";
-        City[] cities = restTemplate.getForObject(url, City[].class);
+        ResponseEntity<PageResponse<City>> response = restTemplate.exchange(
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<PageResponse<City>>() {});
 
-        if (cities == null || cities.length < 2) {
+        List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
+
+        if (cities == null || cities.size() < 2) {
             return 0.0;
         }
 
-        List<City> cityList = Arrays.asList(cities);
+        City oldest =
+                cities.stream().min(Comparator.comparing(City::getCreationDate)).orElseThrow();
 
-        City oldest = cityList.stream()
-                .min(Comparator.comparing(City::getCreationDate))
-                .orElseThrow();
-
-        City newest = cityList.stream()
-                .max(Comparator.comparing(City::getCreationDate))
-                .orElseThrow();
+        City newest =
+                cities.stream().max(Comparator.comparing(City::getCreationDate)).orElseThrow();
 
         return calculateDistance(
                 oldest.getCoordinates().getX(),
