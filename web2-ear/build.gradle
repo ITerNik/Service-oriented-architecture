@@ -20,6 +20,7 @@ dependencies {
     earlib 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     earlib 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     earlib 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    earlib 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 }
 
 ear {
