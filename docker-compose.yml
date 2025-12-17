@@ -71,16 +71,23 @@ services:
     ports:
       - "23442:8443"
 
-  web2:
+  web21:
     build:
       context: .
       dockerfile: web2/Dockerfile
-    container_name: soa_web2
+    container_name: soa_web21
     restart: always
     environment:
       COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
-    ports:
-      - "8085:8080"
+
+  web22:
+    build:
+      context: .
+      dockerfile: web2/Dockerfile
+    container_name: soa_web22
+    restart: always
+    environment:
+      COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
 
 volumes:
   soa_pg_data:
