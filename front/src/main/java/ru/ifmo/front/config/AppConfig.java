@@ -23,15 +23,15 @@ public class AppConfig implements WebMvcConfigurer {
         mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
-    
-        @Override
+
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
                 .setCachePeriod(0)
                 .resourceChain(false);
     }
-    
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/index.html");
