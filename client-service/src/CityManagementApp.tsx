@@ -61,7 +61,7 @@ export default function CityManagementApp() {
       }
 
       const data = await response.json();
-      setCities(data);
+      setCities(data.content || data);
     } catch (err) {
       setError((err as Error).message);
     } finally {
