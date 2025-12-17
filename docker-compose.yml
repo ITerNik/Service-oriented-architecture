@@ -89,5 +89,17 @@ services:
     environment:
       COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
 
+  front:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    container_name: soa_front
+    restart: always
+    environment:
+      BACKEND_SERVICE1_URL: "https://haproxy1:8443"
+      BACKEND_SERVICE2_URL: "https://haproxy2:8443"
+    ports:
+      - "8080:8080"
+
 volumes:
   soa_pg_data:
