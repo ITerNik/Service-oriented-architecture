@@ -19,5 +19,14 @@ spring:
         jdbc:
           batch_size: 20
 
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
+        register: false
+      config:
+        enabled: false
+
 server:
   port: 8080

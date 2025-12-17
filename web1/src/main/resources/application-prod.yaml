@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: web1-service
   datasource:
     url: jdbc:postgresql://postgres:5432/serviceoriented
     driver-class-name: org.postgresql.Driver
@@ -14,6 +16,20 @@ spring:
         format_sql: true
         jdbc:
           batch_size: 20
+  cloud:
+    consul:
+      enabled: true
+      host: consul
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${HOSTNAME:${random.value}}
+
 
 server:
   port: 8080
+
