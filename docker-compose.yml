@@ -1,4 +1,11 @@
 services:
+  consul:
+    image: consul:1.15.4
+    container_name: soa_consul
+    restart: always
+    ports:
+      - "8500:8500"
+
   postgres:
     image: postgres:15
     container_name: soa_postgres
@@ -11,6 +18,88 @@ services:
       - "5432:5432"
     volumes:
       - soa_pg_data:/var/lib/postgresql/data
+    depends_on:
+      - consul
+
+  web11:
+    build:
+      context: ./web1
+      dockerfile: Dockerfile
+    container_name: soa_web11
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/serviceoriented
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONSUL_HOST: consul
+    depends_on:
+      - postgres
+      - consul
+
+  web12:
+    build:
+      context: ./web1
+      dockerfile: Dockerfile
+    container_name: soa_web12
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/serviceoriented
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONSUL_HOST: consul
+    depends_on:
+      - postgres
+      - consul
+
+  haproxy1:
+    build:
+      context: .
+      dockerfile: Dockerfile.haproxy1
+    container_name: soa_haproxy1
+    restart: always
+    ports:
+      - "34566:8443"
+
+  haproxy2:
+    build:
+      context: .
+      dockerfile: Dockerfile.haproxy2
+    container_name: soa_haproxy2
+    restart: always
+    ports:
+      - "23442:8443"
+
+  web21:
+    build:
+      context: .
+      dockerfile: web2/Dockerfile
+    container_name: soa_web21
+    restart: always
+    environment:
+      COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
+
+  web22:
+    build:
+      context: .
+      dockerfile: web2/Dockerfile
+    container_name: soa_web22
+    restart: always
+    environment:
+      COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
+
+  front:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    container_name: soa_front
+    restart: always
+    environment:
+      BACKEND_SERVICE1_URL: "https://haproxy1:8443"
+      BACKEND_SERVICE2_URL: "https://haproxy2:8443"
+    ports:
+      - "8080:8080"
 
 volumes:
   soa_pg_data:

@@ -2,31 +2,14 @@
 
 ## Deployment
 
-### Setup
-
 ```bash
 git clone https://github.com/ITerNik/Service-oriented-architecture.git
-bash scripts/install.sh
-bash scripts/certs.sh
-bash scripts/test.sh
+./gradlew build
+docker compose up -d
 ```
 
-## Description
+## Web interfaces
 
-### install.sh
-
-Downloads wildfly, builds and deploys WAR files to three instances. Configures ports and backend URLs.
-
-### certs.sh
-
-Generates self-signed SSL certificates for WildFly instances and configures them. Imports certs to Java truststores. Also exports certificates for curl testing. (e.g. all-clients-combined.pem for Insomnia)
-
-### test.sh
-
-Starts PostgreSQL and three WildFly instances. Stops them after testing.
-
-## Use
-
-```bash
-ssh -L 8080:localhost:8080 server918r818
-```
+- Frontend service: [http://localhost:8080](http://localhost:8080)
+- Web service 1: [https://localhost:34566](https://localhost:34566)
+- Web service 2: [https://localhost:23442](https://localhost:23442)

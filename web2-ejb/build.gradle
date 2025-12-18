@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.ifmo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+    compileOnly 'org.springframework:spring-web:6.2.2'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+}
+
+tasks.named('jar') {
+    archiveFileName = 'calculating-service-ejb.jar'
+}
