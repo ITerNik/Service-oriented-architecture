@@ -62,6 +62,17 @@ services:
     ports:
       - "34566:8443"
 
+  mule-esb:
+    build:
+      context: .
+      dockerfile: mule-esb/Dockerfile
+    container_name: soa_mule_esb
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      WEB1_SERVICE_URL: "https://haproxy1:8443"
+
   haproxy2:
     build:
       context: .
