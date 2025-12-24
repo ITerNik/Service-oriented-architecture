@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+web1:
+  service:
+    url: ${WEB1_SERVICE_URL:https://localhost:34566}
+
+spring:
+  application:
+    name: mule-esb
+
+cxf:
+  path: /ws
+  servlet:
+    init:
+      service-list-path: /services
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.apache.cxf: INFO
+    ru.ifmo.muleesb: DEBUG
