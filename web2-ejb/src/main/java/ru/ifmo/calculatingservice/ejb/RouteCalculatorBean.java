@@ -14,7 +14,7 @@ public class RouteCalculatorBean implements RouteCalculatorRemote {
     private CityManagementService getSoapClient(String serviceUrl) {
         try {
             URL wsdlUrl = new URL(serviceUrl);
-            QName serviceName = new QName("http://ifmo.ru/muleesb/cities", "CityManagementServiceImplService");
+            QName serviceName = new QName("http://ifmo.ru/muleesb/cities", "CityManagementService");
             Service service = Service.create(wsdlUrl, serviceName);
             return service.getPort(CityManagementService.class);
         } catch (Exception e) {
