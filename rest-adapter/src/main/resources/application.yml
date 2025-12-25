@@ -1,0 +1,21 @@
+server:
+  port: ${SERVER_PORT:8082}
+
+web2:
+  soap:
+    url: ${WEB2_SOAP_URL:http://localhost:8080/web2/RouteService?wsdl}
+
+spring:
+  application:
+    name: rest-adapter
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.apache.cxf: INFO
+    ru.ifmo.restadapter: DEBUG

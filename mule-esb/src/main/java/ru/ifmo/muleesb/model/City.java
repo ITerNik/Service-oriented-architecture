@@ -1,49 +1,59 @@
-package ru.ifmo.calculatingservice.model;
+package ru.ifmo.muleesb.model;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.*;
 import java.time.LocalDate;
 
-@XmlRootElement(name = "city")
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(
+        name = "City",
+        propOrder = {
+            "id",
+            "name",
+            "coordinates",
+            "creationDate",
+            "area",
+            "population",
+            "metersAboveSeaLevel",
+            "capital",
+            "agglomeration",
+            "climate",
+            "governor"
+        })
+@XmlRootElement(name = "city")
 public class City {
-    @XmlElement
+
     private Long id;
 
-    @XmlElement
+    @XmlElement(required = true)
     private String name;
 
-    @XmlElement
+    @XmlElement(required = true)
     private Coordinates coordinates;
 
-    @XmlElement
-    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    @XmlElement(required = true)
     private LocalDate creationDate;
 
-    @XmlElement
+    @XmlElement(required = true)
     private Integer area;
 
-    @XmlElement
+    @XmlElement(required = true)
     private Integer population;
 
-    @XmlElement
     private Integer metersAboveSeaLevel;
 
-    @XmlElement
     private Boolean capital;
 
-    @XmlElement
     private Float agglomeration;
 
-    @XmlElement
+    @XmlElement(required = true)
     private Climate climate;
 
-    @XmlElement
+    @XmlElement(required = true)
     private Human governor;
 
+    public City() {}
+
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -96,8 +106,8 @@ public class City {
         return metersAboveSeaLevel;
     }
 
-    public void setMetersAboveSeaLevel(Integer meters) {
-        this.metersAboveSeaLevel = meters;
+    public void setMetersAboveSeaLevel(Integer metersAboveSeaLevel) {
+        this.metersAboveSeaLevel = metersAboveSeaLevel;
     }
 
     public Boolean getCapital() {

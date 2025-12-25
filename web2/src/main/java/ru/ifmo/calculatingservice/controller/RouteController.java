@@ -1,40 +1,40 @@
 package ru.ifmo.calculatingservice.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.servlet.ServletContext;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import ru.ifmo.calculatingservice.service.RouteService;
 
-@RestController
-@RequestMapping("/route")
+@WebService(serviceName = "RouteService", targetNamespace = "http://ifmo.ru/web2/route")
 public class RouteController {
 
-    @Autowired
-    private RouteService routeService;
+    @Resource
+    private WebServiceContext wsContext;
 
-    @GetMapping("/calculate/to-max-populated")
-    public ResponseEntity<Map<String, Double>> calculateToMaxPopulated() {
-        try {
-            double distance = routeService.calculateToMaxPopulated();
-            Map<String, Double> response = new HashMap<>();
-            response.put("distance", distance);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+    private RouteService getRouteService() {
+        MessageContext mc = wsContext.getMessageContext();
+        ServletContext sc = (ServletContext) mc.get(MessageContext.SERVLET_CONTEXT);
+        return (RouteService) sc.getAttribute("routeService");
     }
 
-    @GetMapping("/calculate/between-oldest-and-newest")
-    public ResponseEntity<Map<String, Double>> calculateBetweenOldestAndNewest() {
-        try {
-            double distance = routeService.calculateBetweenOldestAndNewest();
-            Map<String, Double> response = new HashMap<>();
-            response.put("distance", distance);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
+    @WebMethod
+    public double calculateToMaxPopulated() {
+        RouteService routeService = getRouteService();
+        if (routeService == null) {
+            throw new RuntimeException("RouteService not initialized");
         }
+        return routeService.calculateToMaxPopulated();
+    }
+
+    @WebMethod
+    public double calculateBetweenOldestAndNewest() {
+        RouteService routeService = getRouteService();
+        if (routeService == null) {
+            throw new RuntimeException("RouteService not initialized");
+        }
+        return routeService.calculateBetweenOldestAndNewest();
     }
 }

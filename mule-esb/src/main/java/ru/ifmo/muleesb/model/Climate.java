@@ -1,9 +1,9 @@
-package ru.ifmo.calculatingservice.model;
+package ru.ifmo.muleesb.model;
 
 import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlType;
 
-@XmlType(name = "climate")
+@XmlType(name = "Climate")
 @XmlEnum
 public enum Climate {
     HUMIDCONTINENTAL,
