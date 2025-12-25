@@ -10,10 +10,7 @@ import ru.ifmo.muleesb.model.PageResponse;
 public interface CityManagementService {
 
     @WebMethod
-    PageResponse getCities(
-            @WebParam(name = "page") Integer page,
-            @WebParam(name = "size") Integer size,
-            @WebParam(name = "sort") String sort);
+    PageResponse getCities(@WebParam(name = "page") Integer page, @WebParam(name = "size") Integer size);
 
     @WebMethod
     City createCity(@WebParam(name = "city") City city);

@@ -35,16 +35,15 @@ public class Web1IntegrationRoute extends RouteBuilder {
                 .log("[Camel] getCities called. Incoming params: ${header.params}")
                 .process(exchange -> {
                     Object[] params = exchange.getIn().getBody(Object[].class);
-                    if (params == null || params.length < 3) {
+                    if (params == null || params.length < 2) {
                         throw new IllegalArgumentException("Invalid params");
                     }
                     Integer page = (Integer) params[0];
                     Integer size = (Integer) params[1];
-                    String sort = (String) params[2];
-                    String url = web1ServiceUrl + "/cities?page=" + page + "&size=" + size + "&sort=" + sort;
+                    String url = web1ServiceUrl + "/cities?page=" + page + "&size=" + size;
                     exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
                     exchange.getIn().setHeader(Exchange.HTTP_URI, url);
-                    exchange.getIn().setHeader("X-Log-Params", "page=" + page + ", size=" + size + ", sort=" + sort);
+                    exchange.getIn().setHeader("X-Log-Params", "page=" + page + ", size=" + size);
                     logger.info("[Camel] Preparing HTTP GET to web1: {}", url);
                 })
                 .log("[Camel] HTTP GET to web1: ${header.CamelHttpUri}")

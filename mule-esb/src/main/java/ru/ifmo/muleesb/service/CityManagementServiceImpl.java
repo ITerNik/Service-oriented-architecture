@@ -23,10 +23,10 @@ public class CityManagementServiceImpl implements CityManagementService {
     }
 
     @Override
-    public PageResponse getCities(Integer page, Integer size, String sort) {
-        System.out.println("getCities called with: page=" + page + ", size=" + size + ", sort=" + sort);
+    public PageResponse getCities(Integer page, Integer size) {
+        System.out.println("getCities called with: page=" + page + ", size=" + size);
         PageResponse result =
-                producerTemplate.requestBody("direct:getCities", new Object[] {page, size, sort}, PageResponse.class);
+                producerTemplate.requestBody("direct:getCities", new Object[] {page, size}, PageResponse.class);
         System.out.println("getCities result: " + result);
         return result;
     }
