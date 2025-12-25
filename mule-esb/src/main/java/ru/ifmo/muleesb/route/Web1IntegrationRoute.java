@@ -1,5 +1,8 @@
 package ru.ifmo.muleesb.route;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
@@ -21,8 +24,15 @@ public class Web1IntegrationRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         JacksonDataFormat cityFormat = new JacksonDataFormat(City.class);
+        cityFormat.setObjectMapper(mapper);
+
         JacksonDataFormat pageResponseFormat = new JacksonDataFormat(PageResponse.class);
+        pageResponseFormat.setObjectMapper(mapper);
 
         onException(Exception.class)
                 .log("Error in route: ${exception.message}")
