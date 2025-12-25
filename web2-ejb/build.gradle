@@ -17,10 +17,8 @@ repositories {
 
 dependencies {
     compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
-    implementation 'jakarta.xml.ws:jakarta.xml.ws-api:4.0.0'
-    implementation 'com.sun.xml.ws:jaxws-rt:4.0.1'
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-    implementation 'com.sun.xml.bind:jaxb-impl:4.0.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 }
 
 tasks.named('jar') {
