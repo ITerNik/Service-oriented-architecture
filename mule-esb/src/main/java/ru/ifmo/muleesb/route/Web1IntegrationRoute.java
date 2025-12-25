@@ -42,7 +42,8 @@ public class Web1IntegrationRoute extends RouteBuilder {
                     Integer size = (Integer) params[1];
                     String url = web1ServiceUrl + "/cities?page=" + page + "&size=" + size;
                     exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
-                    exchange.getIn().setHeader(Exchange.HTTP_URI, url);
+                    exchange.getIn().setHeader(Exchange.HTTP_PATH, "/cities");
+                    exchange.getIn().setHeader(Exchange.HTTP_QUERY, "page=" + page + "&size=" + size);
                     exchange.getIn().setHeader("X-Log-Params", "page=" + page + ", size=" + size);
                     logger.info("[Camel] Preparing HTTP GET to web1: {}", url);
                 })
