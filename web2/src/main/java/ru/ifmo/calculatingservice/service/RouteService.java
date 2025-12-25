@@ -1,21 +1,18 @@
 package ru.ifmo.calculatingservice.service;
 
-import jakarta.annotation.PostConstruct;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import ru.ifmo.calculatingservice.ejb.RouteCalculatorRemote;
 
-@Service
 public class RouteService {
 
-    @Value("${collection-managing-service.url}")
-    private String service1Url;
-
+    private String serviceUrl;
     private RouteCalculatorRemote routeCalculator;
 
-    @PostConstruct
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
+    }
+
     public void init() {
         try {
             InitialContext ctx = new InitialContext();
@@ -28,10 +25,10 @@ public class RouteService {
     }
 
     public double calculateToMaxPopulated() {
-        return routeCalculator.calculateToMaxPopulated(service1Url);
+        return routeCalculator.calculateToMaxPopulated(serviceUrl);
     }
 
     public double calculateBetweenOldestAndNewest() {
-        return routeCalculator.calculateBetweenOldestAndNewest(service1Url);
+        return routeCalculator.calculateBetweenOldestAndNewest(serviceUrl);
     }
 }
