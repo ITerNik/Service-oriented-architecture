@@ -39,7 +39,7 @@ public class Web1IntegrationRoute extends RouteBuilder {
                     exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
                     exchange.getIn().setHeader(Exchange.HTTP_URI, url);
                 })
-                .to("https://haproxy1:8443?bridgeEndpoint=true&throwExceptionOnFailure=false")
+.to("https://haproxy1:8443?bridgeEndpoint=true&throwExceptionOnFailure=false")
                 .unmarshal(pageResponseFormat)
                 .log("Response: ${body}");
 
