@@ -36,15 +36,15 @@ public class Web2SoapClient {
 
     private RouteService getRouteService() throws Exception {
         URL wsdlURL = URI.create(web2SoapUrl).toURL();
-        QName serviceName = new QName("http://itmo.ru/web2/route", "RouteService");
+        QName serviceName = new QName("http://ifmo.ru/web2/route", "RouteService");
 
         Service service = Service.create(wsdlURL, serviceName);
-        QName portName = new QName("http://itmo.ru/web2/route", "RouteServicePort");
+        QName portName = new QName("http://ifmo.ru/web2/route", "RouteControllerPort");
 
         return service.getPort(portName, RouteService.class);
     }
 
-    @jakarta.jws.WebService(name = "RouteService", targetNamespace = "http://itmo.ru/web2/route")
+    @jakarta.jws.WebService(name = "RouteService", targetNamespace = "http://ifmo.ru/web2/route")
     public interface RouteService {
 
         @jakarta.jws.WebMethod

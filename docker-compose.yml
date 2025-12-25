@@ -82,7 +82,7 @@ services:
     container_name: soa_rest_adapter1
     restart: always
     environment:
-      WEB2_SOAP_URL: "http://web21:8080/web2/RouteService?wsdl"
+      WEB2_SOAP_URL: "http://web21:8080/ws/RouteService?wsdl"
     depends_on:
       - web21
 
@@ -93,7 +93,7 @@ services:
     container_name: soa_rest_adapter2
     restart: always
     environment:
-      WEB2_SOAP_URL: "http://web22:8080/web2/RouteService?wsdl"
+      WEB2_SOAP_URL: "http://web22:8080/ws/RouteService?wsdl"
     depends_on:
       - web22
 
