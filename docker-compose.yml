@@ -113,7 +113,7 @@ services:
     container_name: soa_web21
     restart: always
     environment:
-      COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
+      COLLECTION_MANAGING_SERVICE_URL: "http://mule-esb:8081/ws/cities?wsdl"
 
   web22:
     build:
@@ -122,7 +122,7 @@ services:
     container_name: soa_web22
     restart: always
     environment:
-      COLLECTION_MANAGING_SERVICE_URL: "https://haproxy1:8443"
+      COLLECTION_MANAGING_SERVICE_URL: "http://mule-esb:8081/ws/cities?wsdl"
 
   front:
     build:
