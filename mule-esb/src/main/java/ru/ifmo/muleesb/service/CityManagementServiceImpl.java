@@ -1,9 +1,9 @@
 package ru.ifmo.muleesb.service;
 
 import jakarta.jws.WebService;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.ifmo.muleesb.client.Web1RestClient;
 import ru.ifmo.muleesb.model.City;
 import ru.ifmo.muleesb.model.PageResponse;
 
@@ -15,50 +15,51 @@ import ru.ifmo.muleesb.model.PageResponse;
         endpointInterface = "ru.ifmo.muleesb.service.CityManagementService")
 public class CityManagementServiceImpl implements CityManagementService {
 
-    private final Web1RestClient web1RestClient;
+    private final ProducerTemplate producerTemplate;
 
     @Autowired
-    public CityManagementServiceImpl(Web1RestClient web1RestClient) {
-        this.web1RestClient = web1RestClient;
+    public CityManagementServiceImpl(ProducerTemplate producerTemplate) {
+        this.producerTemplate = producerTemplate;
     }
 
     @Override
     public PageResponse getCities(Integer page, Integer size, String sort) {
-        return web1RestClient.getCities(page, size, sort);
+        return producerTemplate.requestBodyAndHeader(
+                "direct:getCities", null, "params", new Object[] {page, size, sort}, PageResponse.class);
     }
 
     @Override
     public City createCity(City city) {
-        return web1RestClient.createCity(city);
+        return producerTemplate.requestBody("direct:createCity", city, City.class);
     }
 
     @Override
     public City getCityById(Long id) {
-        return web1RestClient.getCityById(id);
+        return producerTemplate.requestBody("direct:getCityById", id, City.class);
     }
 
     @Override
     public City updateCity(Long id, City city) {
-        return web1RestClient.updateCity(id, city);
+        return producerTemplate.requestBodyAndHeader("direct:updateCity", city, "id", id, City.class);
     }
 
     @Override
     public void deleteCity(Long id) {
-        web1RestClient.deleteCity(id);
+        producerTemplate.requestBody("direct:deleteCity", id);
     }
 
     @Override
     public void deleteCityByMeters(Integer meters) {
-        web1RestClient.deleteCityByMeters(meters);
+        producerTemplate.requestBody("direct:deleteCityByMeters", meters);
     }
 
     @Override
     public City getCityWithMinimalName() {
-        return web1RestClient.getCityWithMinimalName();
+        return producerTemplate.requestBody("direct:getCityWithMinimalName", null, City.class);
     }
 
     @Override
     public City getCityWithMaximalClimate() {
-        return web1RestClient.getCityWithMaximalClimate();
+        return producerTemplate.requestBody("direct:getCityWithMaximalClimate", null, City.class);
     }
 }

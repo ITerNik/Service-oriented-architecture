@@ -24,4 +24,12 @@ management:
 logging:
   level:
     org.apache.cxf: INFO
+    org.apache.camel: INFO
     ru.ifmo.muleesb: DEBUG
+
+camel:
+  springboot:
+    name: CityManagementESB
+  component:
+    cxf:
+      allow-streaming: false
