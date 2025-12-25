@@ -1,12 +1,20 @@
 package ru.ifmo.calculatingservice.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 
+@XmlRootElement(name = "human")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Human {
+    @XmlElement
     private Double height;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @XmlElement
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate birthday;
 
     public Double getHeight() {

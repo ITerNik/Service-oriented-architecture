@@ -1,22 +1,47 @@
 package ru.ifmo.calculatingservice.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 
+@XmlRootElement(name = "city")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class City {
+    @XmlElement
     private Long id;
+
+    @XmlElement
     private String name;
+
+    @XmlElement
     private Coordinates coordinates;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @XmlElement
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate creationDate;
 
+    @XmlElement
     private Integer area;
+
+    @XmlElement
     private Integer population;
+
+    @XmlElement
     private Integer metersAboveSeaLevel;
+
+    @XmlElement
     private Boolean capital;
+
+    @XmlElement
     private Float agglomeration;
+
+    @XmlElement
     private Climate climate;
+
+    @XmlElement
     private Human governor;
 
     public Long getId() {

@@ -1,34 +1,40 @@
 package ru.ifmo.calculatingservice.ejb;
 
 import jakarta.ejb.Stateless;
+import jakarta.xml.ws.Service;
+import java.net.URL;
 import java.util.Comparator;
-import java.util.List;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import javax.xml.namespace.QName;
 import ru.ifmo.calculatingservice.model.City;
 import ru.ifmo.calculatingservice.model.PageResponse;
 
 @Stateless
 public class RouteCalculatorBean implements RouteCalculatorRemote {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private CityManagementService getSoapClient(String serviceUrl) {
+        try {
+            URL wsdlUrl = new URL(serviceUrl);
+            QName serviceName = new QName("http://ifmo.ru/muleesb/cities", "CityManagementServiceImplService");
+            Service service = Service.create(wsdlUrl, serviceName);
+            return service.getPort(CityManagementService.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create SOAP client", e);
+        }
+    }
 
     @Override
     public double calculateToMaxPopulated(String serviceUrl) {
         try {
-            String url = serviceUrl + "/cities?size=1000";
-            ResponseEntity<PageResponse<City>> response = restTemplate.exchange(
-                    url, HttpMethod.GET, null, new ParameterizedTypeReference<PageResponse<City>>() {});
+            CityManagementService client = getSoapClient(serviceUrl);
+            PageResponse cities = client.getCities(0, 1000, null, null);
 
-            List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
-
-            if (cities == null || cities.isEmpty()) {
+            if (cities == null
+                    || cities.getContent() == null
+                    || cities.getContent().isEmpty()) {
                 return 0.0;
             }
 
-            City maxPopulated = cities.stream()
+            City maxPopulated = cities.getContent().stream()
                     .max(Comparator.comparing(City::getPopulation))
                     .orElseThrow();
 
@@ -45,21 +51,20 @@ public class RouteCalculatorBean implements RouteCalculatorRemote {
     @Override
     public double calculateBetweenOldestAndNewest(String serviceUrl) {
         try {
-            String url = serviceUrl + "/cities?size=1000";
-            ResponseEntity<PageResponse<City>> response = restTemplate.exchange(
-                    url, HttpMethod.GET, null, new ParameterizedTypeReference<PageResponse<City>>() {});
+            CityManagementService client = getSoapClient(serviceUrl);
+            PageResponse cities = client.getCities(0, 1000, null, null);
 
-            List<City> cities = response.getBody() != null ? response.getBody().getContent() : null;
-
-            if (cities == null || cities.size() < 2) {
+            if (cities == null
+                    || cities.getContent() == null
+                    || cities.getContent().size() < 2) {
                 return 0.0;
             }
 
-            City oldest = cities.stream()
+            City oldest = cities.getContent().stream()
                     .min(Comparator.comparing(City::getCreationDate))
                     .orElseThrow();
 
-            City newest = cities.stream()
+            City newest = cities.getContent().stream()
                     .max(Comparator.comparing(City::getCreationDate))
                     .orElseThrow();
 

@@ -1,17 +1,22 @@
 package ru.ifmo.calculatingservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class PageResponse<T> {
-    private List<T> content;
+@XmlRootElement(name = "pageResponse")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class PageResponse {
+    @XmlElement
+    private List<City> content;
 
-    public List<T> getContent() {
+    public List<City> getContent() {
         return content;
     }
 
-    public void setContent(List<T> content) {
+    public void setContent(List<City> content) {
         this.content = content;
     }
 }
