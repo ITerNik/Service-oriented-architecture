@@ -72,6 +72,30 @@ services:
       - "8081:8081"
     environment:
       WEB1_SERVICE_URL: "https://haproxy1:8443"
+    depends_on:
+      - haproxy1
+
+  rest-adapter1:
+    build:
+      context: .
+      dockerfile: rest-adapter/Dockerfile
+    container_name: soa_rest_adapter1
+    restart: always
+    environment:
+      WEB2_SOAP_URL: "http://web21:8080/web2/RouteService?wsdl"
+    depends_on:
+      - web21
+
+  rest-adapter2:
+    build:
+      context: .
+      dockerfile: rest-adapter/Dockerfile
+    container_name: soa_rest_adapter2
+    restart: always
+    environment:
+      WEB2_SOAP_URL: "http://web22:8080/web2/RouteService?wsdl"
+    depends_on:
+      - web22
 
   haproxy2:
     build:
