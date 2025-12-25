@@ -1,8 +1,10 @@
 package ru.ifmo.muleesb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.xml.bind.annotation.*;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
         name = "PageResponse",

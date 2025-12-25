@@ -24,8 +24,7 @@ public class CityManagementServiceImpl implements CityManagementService {
 
     @Override
     public PageResponse getCities(Integer page, Integer size, String sort) {
-        return producerTemplate.requestBodyAndHeader(
-                "direct:getCities", null, "params", new Object[] {page, size, sort}, PageResponse.class);
+        return producerTemplate.requestBody("direct:getCities", new Object[] {page, size, sort}, PageResponse.class);
     }
 
     @Override

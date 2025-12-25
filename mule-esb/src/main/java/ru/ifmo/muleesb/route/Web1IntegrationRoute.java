@@ -39,9 +39,13 @@ public class Web1IntegrationRoute extends RouteBuilder {
                     exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
                     exchange.getIn().setHeader(Exchange.HTTP_URI, url);
                 })
-.to("https://haproxy1:8443?bridgeEndpoint=true&throwExceptionOnFailure=false")
+                .to("https://haproxy1:8443?bridgeEndpoint=true&throwExceptionOnFailure=false")
                 .unmarshal(pageResponseFormat)
-                .log("Response: ${body}");
+                .log("Response: ${body}")
+                .process(exchange -> {
+                    Object body = exchange.getIn().getBody();
+                    exchange.getMessage().setBody(body);
+                });
 
         from("direct:getCityById")
                 .routeId("getCityByIdRoute")
@@ -70,15 +74,19 @@ public class Web1IntegrationRoute extends RouteBuilder {
 
         from("direct:updateCity")
                 .routeId("updateCityRoute")
-                .log("Camel route: updateCity ${header.id} with ${body}")
-                .marshal(cityFormat)
+                .log("Camel route: updateCity ${body}")
                 .process(exchange -> {
-                    Long id = exchange.getIn().getHeader("id", Long.class);
+                    Object[] params = exchange.getIn().getBody(Object[].class);
+                    Long id = (Long) params[0];
+                    City city = (City) params[1];
+
                     String url = web1ServiceUrl + "/cities/" + id;
                     exchange.getIn().setHeader(Exchange.HTTP_METHOD, "PUT");
                     exchange.getIn().setHeader(Exchange.HTTP_URI, url);
                     exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/json");
+                    exchange.getIn().setBody(city);
                 })
+                .marshal(cityFormat)
                 .to("https://haproxy1:8443?bridgeEndpoint=true&throwExceptionOnFailure=false")
                 .unmarshal(cityFormat);
 
