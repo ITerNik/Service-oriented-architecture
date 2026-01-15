@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: soa-ingress
+  namespace: soa
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  tls:
+    - hosts:
+        - soa.local
+      secretName: soa-tls-secret
+  rules:
+    - host: soa.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: front
+                port:
+                  number: 8080
+          - path: /api/collection
+            pathType: Prefix
+            backend:
+              service:
+                name: haproxy1
+                port:
+                  number: 8443
+          - path: /api/other
+            pathType: Prefix
+            backend:
+              service:
+                name: haproxy2
+                port:
+                  number: 8443

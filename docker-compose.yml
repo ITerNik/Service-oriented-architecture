@@ -22,6 +22,7 @@ services:
       - consul
 
   web11:
+    platform: linux/amd64
     build:
       context: ./web1
       dockerfile: Dockerfile
@@ -38,6 +39,7 @@ services:
       - consul
 
   web12:
+    platform: linux/amd64
     build:
       context: ./web1
       dockerfile: Dockerfile

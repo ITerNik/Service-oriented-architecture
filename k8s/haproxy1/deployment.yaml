@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy1
+  namespace: soa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: haproxy1
+  template:
+    metadata:
+      labels:
+        app: haproxy1
+    spec:
+      containers:
+        - name: haproxy
+          image: haproxy1:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8443

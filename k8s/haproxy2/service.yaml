@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy2
+  namespace: soa
+spec:
+  selector:
+    app: haproxy2
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
