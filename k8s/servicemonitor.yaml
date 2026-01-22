@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web1-monitor
+  namespace: soa
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: web1
+  endpoints:
+    - port: http
+      path: /actuator/prometheus

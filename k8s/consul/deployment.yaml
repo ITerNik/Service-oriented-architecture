@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+  namespace: soa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: consul
+          image: consul:1.15.4
+          imagePullPolicy: IfNotPresent
+          command:
+            - "consul"
+            - "agent"
+            - "-server"
+            - "-bootstrap"
+            - "-ui"
+            - "-client=0.0.0.0"
+            - "-data-dir=/consul/data"
+          ports:
+            - containerPort: 8500
+          volumeMounts:
+            - name: consul-data
+              mountPath: /consul/data
+          securityContext:
+            runAsUser: 100
+            runAsGroup: 1000
+      volumes:
+        - name: consul-data
+          emptyDir: {}

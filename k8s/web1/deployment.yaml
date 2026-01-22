@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web1
+  namespace: soa
+spec:
+  selector:
+    matchLabels:
+      app: web1
+  template:
+    metadata:
+      labels:
+        app: web1
+    spec:
+      containers:
+        - name: web1
+          image: web1:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/serviceoriented
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
+            - name: SPRING_CLOUD_CONSUL_HOST
+              value: consul
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx768m"
+          ports:
+            - containerPort: 8080
+          
+          # Startup probe - для медленного первого запуска
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18        # 18 * 10 = 180 секунд (3 минуты) на старт
+          
+          # Liveness - только ПОСЛЕ успешного startup
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 0      # Не нужен, есть startupProbe
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          # Readiness - готовность принимать трафик
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 0      # Не нужен, есть startupProbe
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2

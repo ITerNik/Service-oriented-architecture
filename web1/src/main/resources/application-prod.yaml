@@ -29,6 +29,16 @@ spring:
         service-name: ${spring.application.name}
         instance-id: ${spring.application.name}:${HOSTNAME:${random.value}}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
 
 server:
   port: 8080

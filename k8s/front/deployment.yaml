@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  namespace: soa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+        - name: front
+          image: front:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BACKEND_SERVICE1_URL
+              value: "https://haproxy1:8443"
+            - name: BACKEND_SERVICE2_URL
+              value: "https://haproxy2:8443"
+          ports:
+            - containerPort: 8080

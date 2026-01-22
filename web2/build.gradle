@@ -33,6 +33,7 @@ dependencies {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 	}
 	implementation 'org.slf4j:slf4j-api'
+	implementation 'com.netflix.concurrency-limits:concurrency-limits-core:0.5.4'
 	
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	
